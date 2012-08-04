@@ -70,7 +70,7 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
   // a command-line, or scriptable interface.
 
   ON_wString wStr;
-  wStr.Format( L"The \"%s\" command is under construction.\n", EnglishCommandName() );
+  wStr.Format( L"The \"%s\" command is under constructionmodifyyyyy.\n", EnglishCommandName() );
   if( context.IsInteractive() )
     RhinoMessageBox( wStr, PlugIn()->PlugInName(), MB_OK );
   else
