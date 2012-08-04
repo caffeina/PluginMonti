@@ -4,6 +4,8 @@
 
 #include "StdAfx.h"
 #include "script1PlugIn.h"
+#include "DialogPrincipale.h"
+#include "script1App.h"
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -68,6 +70,11 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
 
   // Rhino command that display a dialog box interface should also support
   // a command-line, or scriptable interface.
+	
+	
+	
+
+
 
   ON_wString wStr;
   wStr.Format( L"The \"%s\" command is under constructionmodifyyyyy.\n", EnglishCommandName() );
@@ -75,6 +82,8 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
     RhinoMessageBox( wStr, PlugIn()->PlugInName(), MB_OK );
   else
 	  RhinoApp().Print( wStr );
+
+
 
   // TODO: Return one of the following values:
   //   CRhinoCommand::success:  The command worked.
@@ -84,6 +93,8 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
   //   CRhinoCommand::cancel:   The user interactively canceled the command 
   //                            (by pressing ESCAPE, clicking a CANCEL button, etc.)
   //                            in a Get operation, dialog, time consuming computation, etc.
+  
+
 
   return CRhinoCommand::success;
 }
