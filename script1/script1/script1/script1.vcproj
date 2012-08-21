@@ -443,5 +443,9 @@
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="script1.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

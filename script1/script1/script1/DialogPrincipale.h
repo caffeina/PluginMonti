@@ -1,5 +1,6 @@
 #pragma once
 #include "Resource.h"		// main symbols
+#include "afxwin.h"
 
 // finestra di dialogo DialogPrincipale
 
@@ -18,4 +19,9 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // Supporto DDX/DDV
 
 	DECLARE_MESSAGE_MAP()
+public:
+	CButton disassata;
+	afx_msg void OnBnClickedCancel();
+	int opzione2;
+	afx_msg void OnBnClickedRadio4();
 };
