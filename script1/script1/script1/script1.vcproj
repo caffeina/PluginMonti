@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="script1"
 	ProjectGUID="{28B9D3A4-A02D-4914-A6A7-9821C8B2E364}"
 	RootNamespace="script1"
@@ -288,6 +288,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogPrincipale.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\script1.def"
 				>
 			</File>
@@ -333,6 +337,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\DialogPrincipale.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Resource.h"
 				>

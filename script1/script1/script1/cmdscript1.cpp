@@ -4,6 +4,7 @@
 
 #include "StdAfx.h"
 #include "script1PlugIn.h"
+#include "DialogPrincipale.h"
 
 
 
@@ -77,6 +78,8 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
 
 
   ON_wString wStr;
+  DialogPrincipale dlg;
+  int result = dlg.DoModal();
   wStr.Format( L"The \"%s\" command is under constructionmodifyyyyy.\n", EnglishCommandName() );
   if( context.IsInteractive() )
     RhinoMessageBox( wStr, PlugIn()->PlugInName(), MB_OK );
