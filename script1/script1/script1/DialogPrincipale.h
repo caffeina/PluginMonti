@@ -20,8 +20,11 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CButton disassata;
+	
 	afx_msg void OnBnClickedCancel();
-	int opzione2;
-	afx_msg void OnBnClickedRadio4();
+	
+	afx_msg void OnCbnSelchangeCombo1();
+	afx_msg void OnCbnSelchangeCombo5();
+	afx_msg void OnBnClickedButton1();
+	afx_msg void OnCbnSelchangeCombo2();
 };
