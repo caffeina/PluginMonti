@@ -86,8 +86,6 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
   else
 	  RhinoApp().Print( wStr );
 
-
-
   // TODO: Return one of the following values:
   //   CRhinoCommand::success:  The command worked.
   //   CRhinoCommand::failure:  The command failed because of invalid input, inability
@@ -105,5 +103,6 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
 //
 // END script1 command
 //IT WORKS FINE!
+//IT WORKS FINE2!
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
