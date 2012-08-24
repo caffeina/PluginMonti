@@ -27,4 +27,7 @@ public:
 	afx_msg void OnCbnSelchangeCombo5();
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnCbnSelchangeCombo2();
+	afx_msg void OnEnChangeEdit2();
+	// valore disassamento. inseriti il valore massimo e minimo.
+	int ValoreDisassamento;
 };
