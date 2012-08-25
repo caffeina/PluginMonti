@@ -2,10 +2,11 @@
 // cmdscript1.cpp : command file
 // 
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "script1PlugIn.h"
 #include "DialogPrincipale.h"
-
+#include "afxwin.h"
+#include "script1App.h"
 
 
 ////////////////////////////////////////////////////////////////
@@ -73,13 +74,11 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
   // a command-line, or scriptable interface.
 	
 	
+  
 	
 
 
-
-  ON_wString wStr;
-  DialogPrincipale dlg;
-  int result = dlg.DoModal();
+	 ON_wString wStr;
   wStr.Format( L"The \"%s\" command is under constructionmodifyAAyyyy.\n", EnglishCommandName() );
   if( context.IsInteractive() )
     RhinoMessageBox( wStr, PlugIn()->PlugInName(), MB_OK );
