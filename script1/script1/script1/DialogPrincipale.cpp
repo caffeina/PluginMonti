@@ -80,3 +80,8 @@ void DialogPrincipale::OnEnChangeEdit2()
 
 	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
 }
+
+void DialogPrincipale::KillDialog()
+{
+  OnCancel();
+}

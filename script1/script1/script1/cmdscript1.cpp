@@ -73,8 +73,74 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
   // Rhino command that display a dialog box interface should also support
   // a command-line, or scriptable interface.
 	
+Cscript1PlugIn& plugin = script1PlugIn();
+
+  bool bVisible = plugin.IsDlgVisible();
+
+  if( context.IsInteractive() )
+  {
+    if( false == bVisible )
+      plugin.DisplayDlg();
+  }
+  else
+  {
+    ON_wString prompt;
+    prompt.Format( L"%s window is %s. New value", EnglishCommandName(), bVisible ? L"visible" : L"hidden" );
+
+    CRhinoGetOption go;
+    go.SetCommandPrompt( prompt );
+    int show_opt = go.AddCommandOption( RHCMDOPTNAME(L"Show") );
+    int hide_opt = go.AddCommandOption( RHCMDOPTNAME(L"Hide") );
+    int toggle_opt = go.AddCommandOption( RHCMDOPTNAME(L"Toggle") );
+    go.GetOption();
+    if( go.CommandResult() != CRhinoCommand::success )
+      return go.CommandResult();
+
+    const CRhinoCommandOption* option = go.Option();
+    if( !option )
+      return failure;
+
+    if( option->m_option_index == show_opt )
+    {
+      if( false == bVisible )
+        plugin.DisplayDlg();
+    }
+    else if( option->m_option_index == hide_opt )
+    {
+      if( true == bVisible )
+        plugin.DestroyDlg();
+    }
+    else if( option->m_option_index == toggle_opt )
+    {
+      if( true == bVisible )
+        plugin.DestroyDlg();
+      else
+        plugin.DisplayDlg();
+    }
+    else
+      return failure;
+  }
+
+
+
+
+
+
+/*
+
+	  DialogPrincipale dlg;
+	  CWinThread::m_pMainWnd = &dlg;
+  INT_PTR nResponse = dlg.DoModal();
+  if( nResponse == IDOK )
+	{
+		// TODO:
+  }
+	else if (nResponse == IDCANCEL)
+	{
+		// TODO
+	}
 	
-  
+  */
 	
 
 

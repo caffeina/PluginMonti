@@ -9,11 +9,14 @@ class DialogPrincipale : public CDialog
 	DECLARE_DYNAMIC(DialogPrincipale)
 
 public:
-	DialogPrincipale(CWnd* pParent = NULL);   // costruttore standard
+	DialogPrincipale(CWnd* pParent);   // costruttore standard, MODIFICATO nello!
 	virtual ~DialogPrincipale();
 
 // Dati della finestra di dialogo
 	enum { IDD = IDD_DIALOG1 };
+
+	//void SetPointValue( int item, const ON_3dPoint& pt );
+	void KillDialog();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // Supporto DDX/DDV
@@ -28,6 +31,8 @@ public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnCbnSelchangeCombo2();
 	afx_msg void OnEnChangeEdit2();
+
+	
 	// valore disassamento. inseriti il valore massimo e minimo.
 	int ValoreDisassamento;
 };

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "DialogPrincipale.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // Cscript1PlugIn
 // See script1PlugIn.cpp for the implementation of this class
@@ -22,12 +24,25 @@ public:
   BOOL OnLoadPlugIn();
   void OnUnloadPlugIn();
 
+  void OnSaveAllSettings();
+
   // Online help overrides
   BOOL AddToPlugInHelpMenu() const;
   BOOL OnDisplayPlugInHelp( HWND hWnd ) const;
 
+	// Modeless dialog helpers
+  bool IsDlgCreated();
+  bool IsDlgVisible();
+  bool SetDlgVisible();
+  bool SetDlgHidden();
+  bool DisplayDlg();
+  void DestroyDlg();
+  void ZeroDlg();
+  void SetDlgPointValue( int item, const ON_3dPoint& pt );
+
 private:
   ON_wString m_plugin_version;
+  DialogPrincipale* m_dialog;
 
   // TODO: Add additional class information here
 };

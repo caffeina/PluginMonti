@@ -3,6 +3,7 @@
 //
 
 #include "StdAfx.h"
+#include "script1App.h"
 #include "script1PlugIn.h"
 
 // The plug-in object must be constructed before any plug-in classes
@@ -56,6 +57,8 @@ Cscript1PlugIn& script1PlugIn()
   // Return a reference to the one and only Cscript1PlugIn object
   return thePlugIn; 
 }
+
+
 
 Cscript1PlugIn::Cscript1PlugIn()
 {
@@ -130,6 +133,13 @@ BOOL Cscript1PlugIn::OnLoadPlugIn()
   return CRhinoUtilityPlugIn::OnLoadPlugIn();
 }
 
+
+void Cscript1PlugIn::OnSaveAllSettings()
+{
+  DestroyDlg();
+}
+
+
 void Cscript1PlugIn::OnUnloadPlugIn()
 {
   // Description:
@@ -162,3 +172,93 @@ BOOL Cscript1PlugIn::OnDisplayPlugInHelp( HWND hWnd ) const
   return CRhinoUtilityPlugIn::OnDisplayPlugInHelp( hWnd );
 }
 
+// aggiunta metodi per finestre modeless
+
+bool Cscript1PlugIn::IsDlgCreated()
+{
+  bool rc = false;
+  if( m_dialog && ::IsWindow(m_dialog->m_hWnd) )
+    rc = true;
+  return rc;
+}
+
+bool Cscript1PlugIn::IsDlgVisible()
+{
+  bool rc = false;
+  if( IsDlgCreated() && m_dialog->IsWindowVisible() )
+    rc = true;
+  return rc;
+
+}
+
+bool Cscript1PlugIn::SetDlgVisible()
+{
+  bool rc = false;
+  if( IsDlgCreated() && !IsDlgVisible() )
+  {
+    m_dialog->ShowWindow( SW_SHOWNORMAL );
+    m_dialog->SetFocus();
+    rc = true;
+  }
+  return rc;
+}
+
+bool Cscript1PlugIn::SetDlgHidden()
+{
+  bool rc = false;
+  if( IsDlgCreated() && IsDlgVisible() )
+  {
+    m_dialog->ShowWindow( SW_HIDE );
+    ::SetFocus( RhinoApp().MainWnd() );
+    rc = true;
+  }
+  return rc;
+}
+
+bool Cscript1PlugIn::DisplayDlg()
+{
+	AFX_MANAGE_STATE( AfxGetStaticModuleState() );
+
+  if( IsDlgCreated() )
+  {
+    if( !IsDlgVisible() )
+      SetDlgVisible();
+    m_dialog->SetFocus();
+    return true;
+  }
+
+  m_dialog = new DialogPrincipale( CWnd::FromHandle(RhinoApp().MainWnd()) );
+	if( m_dialog->Create(IDD_DIALOG1, CWnd::FromHandle(RhinoApp().MainWnd())) )
+	{
+		m_dialog->ShowWindow( SW_SHOW );
+		m_dialog->UpdateWindow();
+    m_dialog->SetFocus();
+		return true;
+	}
+
+	return false;
+}
+
+
+void Cscript1PlugIn::DestroyDlg()
+{
+  if( IsDlgCreated() )
+  {
+    m_dialog->KillDialog();
+    m_dialog = 0;
+  }
+}
+
+
+void Cscript1PlugIn::ZeroDlg()
+{
+  m_dialog = 0;
+}
+
+/*
+void Cscript1PlugIn::SetDlgPointValue( int item, const ON_3dPoint& pt )
+{
+  if( IsDlgVisible() )
+    m_dialog->SetPointValue( item, pt );
+}
+*/

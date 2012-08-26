@@ -58,41 +58,13 @@ Cscript1App theApp;
 
 BOOL Cscript1App::InitInstance()
 {	
-	// Initializes OLE support for the application.
-	if( !AfxOleInit() )
-	{
-		AfxMessageBox( IDP_OLE_INIT_FAILED );
-		return FALSE;
-	}
-
-  // InitCommonControlsEx() is required on Windows XP if an application
-	// manifest specifies use of ComCtl32.dll version 6 or later to enable
-	// visual styles.  Otherwise, any window creation will fail.
-	INITCOMMONCONTROLSEX InitCtrls;
-	InitCtrls.dwSize = sizeof(InitCtrls);
 	
-  // Set this to include all the common control classes you want to use
-	// in your application.
-	InitCtrls.dwICC = ICC_WIN95_CLASSES;
-	InitCommonControlsEx( &InitCtrls );
 
 	CWinApp::InitInstance();
 
-	AfxEnableControlContainer();
-
- 
-  DialogPrincipale dlg;
-  m_pMainWnd = &dlg;
-  INT_PTR nResponse = dlg.DoModal();
-  if( nResponse == IDOK )
-	{
-		// TODO:
-  }
-	else if (nResponse == IDCANCEL)
-	{
-		// TODO
-	}
 	
+ 
+
 
 	return TRUE;
 }
