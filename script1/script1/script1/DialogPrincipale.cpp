@@ -91,7 +91,19 @@ void DialogPrincipale::OnBnClickedButton1()
   }
   else
   {
+	  ON_Layer currentLayer;
+	  int numLayers = layer_table.LayerCount();
 	  layer_table.SetCurrentLayerIndex(layer_index);
+	  for(int i = 0; i < numLayers; i++)
+	  {
+		  if(i != layer_index)
+		  {
+			  currentLayer = layer_table[i];
+			  currentLayer.SetVisible(false);
+			  layer_table.ModifyLayer(currentLayer, i);
+		  }
+	  }
+	  m_doc.Redraw();
 	  const CRhinoLayer& layer = m_doc.m_layer_table[layer_index];
 	  ON_SimpleArray<CRhinoObject*> obj_list;
 
@@ -99,25 +111,30 @@ void DialogPrincipale::OnBnClickedButton1()
       if( object_count > 0 )
       {
 	  
-			CRhinoGetObject go;
-			go.SetCommandPrompt( L"SELECT OBJECT LINE" );
-			CRhinoGet::result res = go.GetObjects( 1, 1 );
-			if( res == CRhinoGet::object )
-			{
-			  const CRhinoObjRef& obj_ref = go.Object( 0 );
-			  const CRhinoObject* obj = obj_ref.Object();
-			  if( obj )
-			  {
-				  int R = 0;
-				// TODO
-			  }
-			}
+		//CRhinoGetObject go;
+		//go.SetCommandPrompt( L"SELECT OBJECT LINE" );
+		//CRhinoGet::result res = go.GetObjects( 1, 1 );
+		//if( res == CRhinoGet::object )
+		//{
+		//  const CRhinoObjRef& obj_ref = go.Object( 0 );
+		//  const CRhinoObject* obj = obj_ref.Object();
+		//  if( obj )
+		//  {
+			  int R = 0;
+		//	// TODO
+		//  }
+		//}
+
+		  /*SELECT ALL OF THE LAYER OBJECTS*/ 
+		 // for(int i = 0; i < object_count; i++ )
+		 // {
+			//CRhinoObject* obj = obj_list[i];
+			//if( obj && obj->IsSelectable() )
+			//  obj->Select();
+		 // }
 	  }/*CHIUSURA IF( OBJECT_COUNT > 0 )*/
 	int R = 0;
   }
-
-
-
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
