@@ -215,7 +215,7 @@ bool Cscript1PlugIn::SetDlgHidden()
   return rc;
 }
 
-bool Cscript1PlugIn::DisplayDlg()
+bool Cscript1PlugIn::DisplayDlg(CRhinoDoc& m_doc)
 {
 	AFX_MANAGE_STATE( AfxGetStaticModuleState() );
 
@@ -227,12 +227,12 @@ bool Cscript1PlugIn::DisplayDlg()
     return true;
   }
 
-  m_dialog = new DialogPrincipale( CWnd::FromHandle(RhinoApp().MainWnd()) );
+	m_dialog = new DialogPrincipale( CWnd::FromHandle(RhinoApp().MainWnd()), m_doc);
 	if( m_dialog->Create(IDD_DIALOG1, CWnd::FromHandle(RhinoApp().MainWnd())) )
 	{
 		m_dialog->ShowWindow( SW_SHOW );
 		m_dialog->UpdateWindow();
-    m_dialog->SetFocus();
+		m_dialog->SetFocus();
 		return true;
 	}
 

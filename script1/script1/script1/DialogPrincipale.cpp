@@ -9,11 +9,11 @@
 
 IMPLEMENT_DYNAMIC(DialogPrincipale, CDialog)
 
-DialogPrincipale::DialogPrincipale(CWnd* pParent /*=NULL*/)
+DialogPrincipale::DialogPrincipale(CWnd* pParent, CRhinoDoc& doc)
 	: CDialog(DialogPrincipale::IDD, pParent)
-	, ValoreDisassamento(0)
+	, ValoreDisassamento(0),
+	m_doc(doc)
 {
-
 }
 
 DialogPrincipale::~DialogPrincipale()
@@ -38,6 +38,7 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON1, &DialogPrincipale::OnBnClickedButton1)
 	ON_CBN_SELCHANGE(IDC_COMBO2, &DialogPrincipale::OnCbnSelchangeCombo2)
 	ON_EN_CHANGE(IDC_EDIT2, &DialogPrincipale::OnEnChangeEdit2)
+	ON_BN_CLICKED(IDOK, &DialogPrincipale::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -63,6 +64,60 @@ void DialogPrincipale::OnCbnSelchangeCombo5()
 
 void DialogPrincipale::OnBnClickedButton1()
 {
+  /*GET THE LAYER NAME*/
+  CRhinoGetString gs;
+  gs.SetCommandPrompt( L"NAME OF LAYER WHICH CONTAINS VISIONAL PLANE :" );
+  gs.GetString();
+  if( gs.CommandResult() != CRhinoCommand::success )
+  {
+	  exit(-1);
+  }
+  /*VALIDATE THE STRING*/
+  ON_wString layer_name = gs.String();
+  layer_name.TrimLeftAndRight();
+  if( layer_name.IsEmpty() )
+  {
+	  exit(-1);
+  }
+    
+  /*GET A REFERENCE TO THE LAYER TABLE*/
+  CRhinoLayerTable& layer_table = m_doc.m_layer_table;
+ 
+  /*FIND THE LAYER*/ 
+  int layer_index = layer_table.FindLayer(layer_name );
+  if( layer_index < 0 )
+  {
+    RhinoApp().Print( L"LAYER \"%s\" DOES NOT EXIST.\n", layer_name );
+  }
+  else
+  {
+	  layer_table.SetCurrentLayerIndex(layer_index);
+	  const CRhinoLayer& layer = m_doc.m_layer_table[layer_index];
+	  ON_SimpleArray<CRhinoObject*> obj_list;
+
+      int object_count = m_doc.LookupObject( layer, obj_list );
+      if( object_count > 0 )
+      {
+	  
+			CRhinoGetObject go;
+			go.SetCommandPrompt( L"SELECT OBJECT LINE" );
+			CRhinoGet::result res = go.GetObjects( 1, 1 );
+			if( res == CRhinoGet::object )
+			{
+			  const CRhinoObjRef& obj_ref = go.Object( 0 );
+			  const CRhinoObject* obj = obj_ref.Object();
+			  if( obj )
+			  {
+				  int R = 0;
+				// TODO
+			  }
+			}
+	  }/*CHIUSURA IF( OBJECT_COUNT > 0 )*/
+	int R = 0;
+  }
+
+
+
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
@@ -84,4 +139,9 @@ void DialogPrincipale::OnEnChangeEdit2()
 void DialogPrincipale::KillDialog()
 {
   OnCancel();
+}
+void DialogPrincipale::OnBnClickedOk()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	OnOK();
 }

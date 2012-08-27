@@ -9,7 +9,7 @@ class DialogPrincipale : public CDialog
 	DECLARE_DYNAMIC(DialogPrincipale)
 
 public:
-	DialogPrincipale(CWnd* pParent);   // costruttore standard, MODIFICATO nello!
+	DialogPrincipale(CWnd* pParent, CRhinoDoc& m_doc);   // costruttore standard, MODIFICATO nello!
 	virtual ~DialogPrincipale();
 
 // Dati della finestra di dialogo
@@ -35,4 +35,6 @@ public:
 	
 	// valore disassamento. inseriti il valore massimo e minimo.
 	int ValoreDisassamento;
+	CRhinoDoc& m_doc;
+	afx_msg void OnBnClickedOk();
 };

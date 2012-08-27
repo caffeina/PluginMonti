@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="script1"
 	ProjectGUID="{28B9D3A4-A02D-4914-A6A7-9821C8B2E364}"
 	RootNamespace="script1"
@@ -377,68 +377,20 @@
 			Filter="lib"
 			>
 			<File
-				RelativePath="..\..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\openNURBS\lib\opennurbs.lib"
+				RelativePath="..\..\..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\openNURBS\lib\opennurbs.lib"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\openNURBS\lib\opennurbs_d.lib"
+				RelativePath="..\..\..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\openNURBS\lib\opennurbs_d.lib"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PseudoDebug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\lib\Rhino4.lib"
+				RelativePath="..\..\..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\lib\Rhino4.lib"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\lib\Rhino4_d.lib"
+				RelativePath="..\..\..\..\..\..\..\..\..\Program Files\Rhino 4.0 SDK\lib\Rhino4_d.lib"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PseudoDebug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>
