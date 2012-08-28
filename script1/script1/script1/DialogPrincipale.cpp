@@ -107,36 +107,67 @@ void DialogPrincipale::OnBnClickedButton1()
 	  const CRhinoLayer& layer = m_doc.m_layer_table[layer_index];
 	  ON_SimpleArray<CRhinoObject*> obj_list;
 
+	 
+	  
       int object_count = m_doc.LookupObject( layer, obj_list );
       if( object_count > 0 )
       {
-	  
-		//CRhinoGetObject go;
-		//go.SetCommandPrompt( L"SELECT OBJECT LINE" );
-		//CRhinoGet::result res = go.GetObjects( 1, 1 );
-		//if( res == CRhinoGet::object )
-		//{
-		//  const CRhinoObjRef& obj_ref = go.Object( 0 );
-		//  const CRhinoObject* obj = obj_ref.Object();
-		//  if( obj )
-		//  {
-			  int R = 0;
-		//	// TODO
-		//  }
-		//}
+		 /********************************************************************/
+		 //CRhinoObject* obj = obj_list[0];
+		 //if( obj && obj->IsSelectable() )
+		 //{
+			// obj->Select(true);
+			// obj->Highlight(true);
+			// m_doc.Redraw();
+		 //}
+		 /********************************************************************/
+		 CRhinoGetObject gc;
+		 gc.SetCommandPrompt( L"Select line to extend" );
+         gc.SetGeometryFilter( CRhinoGetObject::curve_object );
+         gc.GetObjects( 1, 1 );
+		 if(gc.CommandResult() == CRhinoCommand::success )
+		 {
+			const CRhinoObjRef& objref = gc.Object(0);
+            const ON_Curve* pC = ON_Curve::Cast( objref.Geometry() );
+			ON_Curve* crv0 = pC->DuplicateCurve();
+			ON_Curve* crv1 = pC->DuplicateCurve();
+			bool rc0 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 1, 5);
+			bool rc1 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 0, 15);
+			m_doc.ReplaceObject(objref, *crv0 );
+            m_doc.Redraw();
+			
+			ON_3dPoint p0 = crv0->PointAtStart();
+            ON_3dPoint p1 = crv0->PointAtEnd();
 
-		  /*SELECT ALL OF THE LAYER OBJECTS*/ 
-		 // for(int i = 0; i < object_count; i++ )
-		 // {
-			//CRhinoObject* obj = obj_list[i];
-			//if( obj && obj->IsSelectable() )
-			//  obj->Select();
-		 // }
+			gc.ClearCommandHistoryWindowText();
+			gc.SetCommandPrompt( L"ENTRY ANTERIOR ANGLE EXTENSION (ALPHA=30°):" );
+			gc.get_string;
+			ON_wString alphaAngle = gc.String();
+			//CRhinoGetObject gc;
+			gc.SetCommandPrompt( L"ENTRY ANTERIOR EXTENSION LENGTH(L=80mm):" );
+			gc.get_string;
+			ON_wString antLength = gc.String();
+
+			//CRhinoGetObject gc;
+			gc.SetCommandPrompt( L"ENTRY POSTERIOR ANGLE EXTENSION (BETA=ALPHA+10°):" );
+			gc.get_string;
+			ON_wString betaAngle = gc.String();
+			//CRhinoGetObject gc;
+			gc.SetCommandPrompt( L"ENTRY POSTERIOR EXTENSION LENGTH(L=80mm):" );
+			gc.get_string;
+			ON_wString posLength = gc.String();
+
+
+
+			/*CLEAN UP OR LEAK*/ 
+			delete crv0;
+			crv0 = 0;
+			int R = 0;
+	     }
 	  }/*CHIUSURA IF( OBJECT_COUNT > 0 )*/
-	int R = 0;
-  }
+  }/*CHIUSURA ELSE*/
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
-}
+}/*CHIUSURA DIALOGPRINCIPALE::ONBNCLICKEDBUTTON1*/
 
 void DialogPrincipale::OnCbnSelchangeCombo2()
 {

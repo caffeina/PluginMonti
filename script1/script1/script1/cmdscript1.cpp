@@ -121,36 +121,6 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
   //    return failure;
   //}
 
-
-
-
-
-
-/*
-
-	  DialogPrincipale dlg;
-	  CWinThread::m_pMainWnd = &dlg;
-  INT_PTR nResponse = dlg.DoModal();
-  if( nResponse == IDOK )
-	{
-		// TODO:
-  }
-	else if (nResponse == IDCANCEL)
-	{
-		// TODO
-	}
-	
-  */
-	
-
-
-	 ON_wString wStr;
-  wStr.Format( L"The \"%s\" command is under constructionmodifyAAyyyy.\n", EnglishCommandName() );
-  if( context.IsInteractive() )
-    RhinoMessageBox( wStr, PlugIn()->PlugInName(), MB_OK );
-  else
-	  RhinoApp().Print( wStr );
-
   // TODO: Return one of the following values:
   //   CRhinoCommand::success:  The command worked.
   //   CRhinoCommand::failure:  The command failed because of invalid input, inability
