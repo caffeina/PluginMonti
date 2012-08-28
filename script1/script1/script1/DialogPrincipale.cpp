@@ -139,7 +139,6 @@ void DialogPrincipale::OnBnClickedButton1()
 			ON_3dPoint p0 = crv0->PointAtStart();
             ON_3dPoint p1 = crv0->PointAtEnd();
 
-			gc.ClearCommandHistoryWindowText();
 			gc.SetCommandPrompt( L"ENTRY ANTERIOR ANGLE EXTENSION (ALPHA=30°):" );
 			gc.get_string;
 			ON_wString alphaAngle = gc.String();
