@@ -139,25 +139,28 @@ void DialogPrincipale::OnBnClickedButton1()
 			ON_3dPoint p0 = crv0->PointAtStart();
             ON_3dPoint p1 = crv0->PointAtEnd();
  
-			gs.SetCommandPrompt( L"ENTER ANTERIOR ANGLE FOR EXTENSION : " );
-			gs.SetCommandPromptDefault(L"30°");
-			gs.GetString();
-			ON_wString antAngle = gs.String();
+			CRhinoGetNumber gn;
+			gn.SetCommandPrompt( L"ENTER ANTERIOR ANGLE FOR EXTENSION : " );
+			gn.SetCommandPromptDefault(L"30°");
+			gn.GetNumber();
+			double antAngle = gn.Number();
 
-			gs.SetCommandPrompt( L"ENTER ANTERIOR LENGTH FOR EXTENSION : " );
-			gs.SetCommandPromptDefault(L"80mm");
-			gs.GetString();
-			ON_wString antLen = gs.String();
+			gn.SetCommandPrompt( L"ENTER ANTERIOR LENGTH FOR EXTENSION : " );
+			gn.SetCommandPromptDefault(L"80mm");
+			gn.GetNumber();
+			double antLen = gn.Number();
 
-			gs.SetCommandPrompt( L"ENTER POSTERIOR ANGLE FOR EXTENSION : " );
-			gs.SetCommandPromptDefault(L"ALPHA + 10°");
-			gs.GetString();
-			ON_wString posAngle = gs.String();
+			gn.SetCommandPrompt( L"ENTER POSTERIOR ANGLE FOR EXTENSION : " );
+			gn.SetCommandPromptDefault(L"ALPHA + 10°");
+			gn.GetNumber();
+			double posAngle = gn.Number();
 
-			gs.SetCommandPrompt( L"ENTER POSTERIOR LENGTH FOR EXTENSION : " );
-			gs.SetCommandPromptDefault(L"80mm");
-			gs.GetString();
-			CString posLen = gs.String();
+			gn.SetCommandPrompt( L"ENTER POSTERIOR LENGTH FOR EXTENSION : " );
+			gn.SetCommandPromptDefault(L"80mm");
+			gn.GetNumber();
+			double posLen = gn.Number();
+		
+  
 
 
 
