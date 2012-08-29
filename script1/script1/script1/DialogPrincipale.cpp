@@ -130,7 +130,6 @@ void DialogPrincipale::OnBnClickedButton1()
 			const CRhinoObjRef& objref = gc.Object(0);
             const ON_Curve* pC = ON_Curve::Cast( objref.Geometry() );
 			ON_Curve* crv0 = pC->DuplicateCurve();
-			ON_Curve* crv1 = pC->DuplicateCurve();
 			bool rc0 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 1, 5);
 			bool rc1 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 0, 15);
 			m_doc.ReplaceObject(objref, *crv0 );
@@ -160,9 +159,16 @@ void DialogPrincipale::OnBnClickedButton1()
 			gn.GetNumber();
 			double posLen = gn.Number();
 		
-  
+			ON_3dPoint pointStart;
+            ON_3dPoint pointEnd;
 
+			pointStart = crv0->PointAtStart();
+			
+			pointEnd   = crv0->PointAtEnd();
 
+			double len = sqrt((pointStart.x - pointEnd.x)*(pointStart.x - pointEnd.x) + 
+				              (pointStart.y - pointEnd.y)*(pointStart.y - pointEnd.y) + 
+							  (pointStart.z - pointEnd.z)*(pointStart.z - pointEnd.z));
 
 			/*CLEAN UP OR LEAK*/ 
 			delete crv0;

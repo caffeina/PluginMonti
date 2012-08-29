@@ -72,7 +72,7 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
 
   // Rhino command that display a dialog box interface should also support
   // a command-line, or scriptable interface.
-	
+  
   Cscript1PlugIn& plugin = script1PlugIn();
 
   bool bVisible = plugin.IsDlgVisible();
