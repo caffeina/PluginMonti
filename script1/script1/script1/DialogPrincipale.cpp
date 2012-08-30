@@ -142,22 +142,33 @@ void DialogPrincipale::OnBnClickedButton1()
 			gn.SetCommandPrompt( L"ENTER ANTERIOR ANGLE FOR EXTENSION : " );
 			gn.SetCommandPromptDefault(L"30°");
 			gn.GetNumber();
-			double antAngle = gn.Number();
+			double alphaAngle = gn.Number();
 
 			gn.SetCommandPrompt( L"ENTER ANTERIOR LENGTH FOR EXTENSION : " );
 			gn.SetCommandPromptDefault(L"80mm");
 			gn.GetNumber();
 			double antLen = gn.Number();
 
+			gn.SetCommandPrompt( L"ENTER ANTERIOR FILLET RADIUS : " );
+			gn.SetCommandPromptDefault(L"80mm");
+			gn.GetNumber();
+			double antRad = gn.Number();
+
 			gn.SetCommandPrompt( L"ENTER POSTERIOR ANGLE FOR EXTENSION : " );
 			gn.SetCommandPromptDefault(L"ALPHA + 10°");
 			gn.GetNumber();
-			double posAngle = gn.Number();
+			double betaAngle = gn.Number();
 
 			gn.SetCommandPrompt( L"ENTER POSTERIOR LENGTH FOR EXTENSION : " );
 			gn.SetCommandPromptDefault(L"80mm");
 			gn.GetNumber();
 			double posLen = gn.Number();
+
+			gn.SetCommandPrompt( L"ENTER POSTERIOR FILLET RADIUS : " );
+			gn.SetCommandPromptDefault(L"80mm");
+			gn.GetNumber();
+			double posRad = gn.Number();
+
 		
 			ON_3dPoint pointStart;
             ON_3dPoint pointEnd;
@@ -166,9 +177,24 @@ void DialogPrincipale::OnBnClickedButton1()
 			
 			pointEnd   = crv0->PointAtEnd();
 
+			ON_3dPoint point0((pointStart.x - posLen*cos(betaAngle*acos(-1.0)/180.0)), 0.0, (pointStart.z + posLen*sin(betaAngle*acos(-1.0)/180.0)));
+			ON_3dPoint point1((pointEnd.x + antLen*cos(alphaAngle*acos(-1.0)/180.0)), 0.0, (pointEnd.z - antLen*sin(alphaAngle*acos(-1.0)/180.0)));
+
+
 			double len = sqrt((pointStart.x - pointEnd.x)*(pointStart.x - pointEnd.x) + 
 				              (pointStart.y - pointEnd.y)*(pointStart.y - pointEnd.y) + 
 							  (pointStart.z - pointEnd.z)*(pointStart.z - pointEnd.z));
+
+
+			// Create the line curves to fillet
+			ON_LineCurve curve0( pointStart, point0 );
+			ON_LineCurve curve1( point1, pointEnd );
+
+
+		   // Add the geometry
+			m_doc.AddCurveObject( curve0 );
+			m_doc.AddCurveObject( curve1 );
+		    m_doc.Redraw();
 
 			/*CLEAN UP OR LEAK*/ 
 			delete crv0;
