@@ -263,6 +263,8 @@ void DialogPrincipale::OnBnClickedButton1()
 			//	m_doc.Redraw();
 			//}
 
+			m_doc.AddCurveObject( curve0 );
+			m_doc.Redraw();
 
 			/*CLEAN UP OR LEAK*/ 
 			delete crv0;
