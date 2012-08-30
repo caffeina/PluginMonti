@@ -150,7 +150,7 @@ void DialogPrincipale::OnBnClickedButton1()
 			double antLen = gn.Number();
 
 			gn.SetCommandPrompt( L"ENTER ANTERIOR FILLET RADIUS : " );
-			gn.SetCommandPromptDefault(L"80mm");
+			gn.SetCommandPromptDefault(L"6mm");
 			gn.GetNumber();
 			double antRad = gn.Number();
 
@@ -165,13 +165,22 @@ void DialogPrincipale::OnBnClickedButton1()
 			double posLen = gn.Number();
 
 			gn.SetCommandPrompt( L"ENTER POSTERIOR FILLET RADIUS : " );
-			gn.SetCommandPromptDefault(L"80mm");
+			gn.SetCommandPromptDefault(L"13mm");
 			gn.GetNumber();
 			double posRad = gn.Number();
 
 		
 			ON_3dPoint pointStart;
             ON_3dPoint pointEnd;
+		 
+			//// Fillet radius
+			//double radius = 1.0;
+		 
+			// Do the fillet calculation
+			double t0 = 0.0, t1 = 0.0;
+ 
+			ON_Plane plane;
+			plane.plane_equation.y = 1.0;
 
 			pointStart = crv0->PointAtStart();
 			
@@ -181,20 +190,79 @@ void DialogPrincipale::OnBnClickedButton1()
 			ON_3dPoint point1((pointEnd.x + antLen*cos(alphaAngle*acos(-1.0)/180.0)), 0.0, (pointEnd.z - antLen*sin(alphaAngle*acos(-1.0)/180.0)));
 
 
-			double len = sqrt((pointStart.x - pointEnd.x)*(pointStart.x - pointEnd.x) + 
-				              (pointStart.y - pointEnd.y)*(pointStart.y - pointEnd.y) + 
-							  (pointStart.z - pointEnd.z)*(pointStart.z - pointEnd.z));
+			//double len = sqrt((pointStart.x - pointEnd.x)*(pointStart.x - pointEnd.x) + 
+			//	              (pointStart.y - pointEnd.y)*(pointStart.y - pointEnd.y) + 
+			//				  (pointStart.z - pointEnd.z)*(pointStart.z - pointEnd.z));
 
 
-			// Create the line curves to fillet
+			/*CREATE THE LINE CURVES TO FILLET*/ 
 			ON_LineCurve curve0( pointStart, point0 );
 			ON_LineCurve curve1( point1, pointEnd );
 
+			// Fillet at the end points of the line curves
+			double curve0_t = crv0->Domain().Max();
+			double curve1_t = curve1.Domain().Max();
 
-		   // Add the geometry
-			m_doc.AddCurveObject( curve0 );
-			m_doc.AddCurveObject( curve1 );
-		    m_doc.Redraw();
+
+			if( RhinoGetFilletPoints(curve1,  *crv0, antRad, curve0_t, curve1_t, t0, t1, plane) )
+			{
+				// Trim back the two line curves
+				ON_Interval domain0( curve1.Domain().Max(), t0 );
+				curve1.Trim( domain0 );
+		 
+				ON_Interval domain1( crv0->Domain().Max(), t1 );
+				crv0->Trim( domain1 );
+		 
+				// Compute the fillet curve
+				ON_3dVector radial0 = curve1.PointAt(t0) - plane.Origin();
+				radial0.Unitize();
+		 
+				ON_3dVector radial1 = crv0->PointAt(t1) - plane.Origin();
+				radial1.Unitize();
+		 
+				double angle = acos( radial0 * radial1 );
+				ON_Plane fillet_plane( plane.Origin(), radial0, radial1 );
+				ON_Arc fillet( fillet_plane, plane.Origin(), antRad, angle );
+		 
+				/*ADD THE GEOMETRY*/ 
+				m_doc.AddCurveObject( curve1 );
+				m_doc.ReplaceObject(objref, *crv0 );
+				m_doc.AddCurveObject( fillet );
+				m_doc.Redraw();
+			}
+
+			//t0 = 0.0, t1 = 0.0;
+			///*FILLET AT THE END POINTS OF THE LINE CURVES*/
+			//curve0_t = crv0->Domain().Max();
+			//curve1_t = curve0.Domain().Min();
+
+			//if( RhinoGetFilletPoints(curve0, *crv0, antRad, curve0_t, curve1_t, t0, t1, plane) )
+			//{
+			//	// Trim back the two line curves
+			//	ON_Interval domain0( curve0.Domain().Min(), t0 );
+			//	curve0.Trim( domain0 );
+		 //
+			//	ON_Interval domain1( crv0->Domain().Max(), t1 );
+			//	crv0->Trim( domain1 );
+		 //
+			//	// Compute the fillet curve
+			//	ON_3dVector radial0 = curve0.PointAt(t0) - plane.Origin();
+			//	radial0.Unitize();
+		 //
+			//	ON_3dVector radial1 = crv0->PointAt(t1) - plane.Origin();
+			//	radial1.Unitize();
+		 //
+			//	double angle = acos( radial0 * radial1 );
+			//	ON_Plane fillet_plane( plane.Origin(), radial0, radial1 );
+			//	ON_Arc fillet( fillet_plane, plane.Origin(), antRad, angle );
+		 //
+			//	/*ADD THE GEOMETRY*/ 
+			//	m_doc.AddCurveObject( curve0 );
+			//	m_doc.ReplaceObject(objref, *crv0 );
+			//	m_doc.AddCurveObject( fillet );
+			//	m_doc.Redraw();
+			//}
+
 
 			/*CLEAN UP OR LEAK*/ 
 			delete crv0;
