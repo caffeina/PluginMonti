@@ -32,6 +32,11 @@ public:
 	afx_msg void OnCbnSelchangeCombo2();
 	afx_msg void OnEnChangeEdit2();
 
+protected:
+	CRhino4Interface m_Interface;
+	CRhinoScript m_RhinoScript;
+
+public:
 	
 	// valore disassamento. inseriti il valore massimo e minimo.
 	int ValoreDisassamento;

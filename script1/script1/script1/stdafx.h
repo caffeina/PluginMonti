@@ -51,6 +51,9 @@
 
 // Rhino Plug-in
 #include "C:\Program Files\Rhino 4.0 SDK\Inc\RhinoSdk.h"
+#include "CRhinoScript.h"
+#include "CRhino4Interface.h"
+#include "CRhino4.h"
 
 #if defined( RHINO_DEBUG_PLUGIN )
 // Now that all the system headers are read, we can

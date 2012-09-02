@@ -338,6 +338,22 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\CRhino4.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRhino4Application.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRhino4Interface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRhinoScript.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DialogPrincipale.h"
 				>
 			</File>
