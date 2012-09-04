@@ -331,6 +331,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\..\..\..\..\..\Downloads\TestScript\VariantUtilities.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="File di intestazione"
@@ -371,6 +375,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\..\..\Downloads\TestScript\VariantUtilities.h"
 				>
 			</File>
 		</Filter>

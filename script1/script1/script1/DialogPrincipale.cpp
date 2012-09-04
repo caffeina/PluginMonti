@@ -160,10 +160,19 @@ void DialogPrincipale::OnBnClickedButton1()
 			////////////////////
 			RhinoScript.AttachDispatch( var.pdispVal, TRUE );
 			RhinoScript.AddCircle( var_xy_plane, COleVariant((long)60) );
-			COleVariant CURVA = crv0;
-			RhinoScript.ExtendCurveLength(crv0,CRhinoExtend::Line,1,5);
+			//COleVariant CURVA = crv0;
+			//RhinoScript.ExtendCurveLength(crv0,CRhinoExtend::Line,1,5);
 			RhinoScript.DocumentModified( COleVariant(VARIANT_FALSE) );
 
+			RhinoScript.ReleaseDispatch();
+
+			///
+			RhinoScript.AttachDispatch( var.pdispVal, TRUE );
+			//RhinoScript.GetCurveObject(COleVariant (L"prova"), COleVariant (m),COleVariant (n));
+			//RhinoScript.GetString(COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE) );
+			RhinoScript.AddCircle( var_xy_plane, COleVariant((long)13) );
+			COleVariant ccc = RhinoScript.GetCurveObject(COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE));
+			RhinoScript.ExtendCurveLength(ccc,COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE));
 			RhinoScript.ReleaseDispatch();
 
 			///////////////////////////
