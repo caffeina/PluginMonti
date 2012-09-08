@@ -259,37 +259,37 @@ void DialogPrincipale::OnBnClickedButton1()
 			}
 			
 
-			//t0 = 0.0, t1 = 0.0;
-			///*FILLET AT THE END POINTS OF THE LINE CURVES*/
-			//curve0_t = crv0->Domain().Max();
-			//curve1_t = curve0.Domain().Min();
+			t0 = 0.0, t1 = 0.0;
+			//*FILLET AT THE END POINTS OF THE LINE CURVES
+			curve0_t = crv0->Domain().Max();
+			curve1_t = curve0.Domain().Min();
 
-			//if( RhinoGetFilletPoints(curve0, *crv0, antRad, curve0_t, curve1_t, t0, t1, plane) )
-			//{
-			//	// Trim back the two line curves
-			//	ON_Interval domain0( curve0.Domain().Min(), t0 );
-			//	curve0.Trim( domain0 );
-		 //
-			//	ON_Interval domain1( crv0->Domain().Max(), t1 );
-			//	crv0->Trim( domain1 );
-		 //
-			//	// Compute the fillet curve
-			//	ON_3dVector radial0 = curve0.PointAt(t0) - plane.Origin();
-			//	radial0.Unitize();
-		 //
-			//	ON_3dVector radial1 = crv0->PointAt(t1) - plane.Origin();
-			//	radial1.Unitize();
-		 //
-			//	double angle = acos( radial0 * radial1 );
-			//	ON_Plane fillet_plane( plane.Origin(), radial0, radial1 );
-			//	ON_Arc fillet( fillet_plane, plane.Origin(), antRad, angle );
-		 //
-			//	/*ADD THE GEOMETRY*/ 
-			//	m_doc.AddCurveObject( curve0 );
-			//	m_doc.ReplaceObject(objref, *crv0 );
-			//	m_doc.AddCurveObject( fillet );
-			//	m_doc.Redraw();
-			//}
+			if( RhinoGetFilletPoints(curve0, *crv0, posRad, curve0_t, curve1_t, t0, t1, plane) )
+			{
+				// Trim back the two line curves
+				ON_Interval domain0( curve0.Domain().Min(), t0 );
+				curve0.Trim( domain0 );
+		 
+				ON_Interval domain1( crv0->Domain().Max(), t1 );
+				crv0->Trim( domain1 );
+		 
+				// Compute the fillet curve
+				ON_3dVector radial0 = curve0.PointAt(t0) - plane.Origin();
+				radial0.Unitize();
+		 
+				ON_3dVector radial1 = crv0->PointAt(t1) - plane.Origin();
+				radial1.Unitize();
+		 
+				double angle = acos( radial0 * radial1 );
+				ON_Plane fillet_plane( plane.Origin(), radial0, radial1 );
+				ON_Arc fillet( fillet_plane, plane.Origin(), posRad, angle );
+		 
+				/*ADD THE GEOMETRY*/ 
+				m_doc.AddCurveObject( curve0 );
+				m_doc.ReplaceObject(objref, *crv0 );
+				m_doc.AddCurveObject( fillet );
+				m_doc.Redraw();
+			}
 // aniello begin
 // Get the next runtime object serial number after scripting
   unsigned int next_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
