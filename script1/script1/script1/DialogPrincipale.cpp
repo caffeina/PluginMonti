@@ -63,7 +63,14 @@ void DialogPrincipale::OnCbnSelchangeCombo5()
 }
 
 void DialogPrincipale::OnBnClickedButton1()
-{
+{	
+	//aniello gegin
+	// Disable redrawing
+  CRhinoView::EnableDrawing( FALSE );
+ 
+  // Get the next runtime object serial number before scripting
+  unsigned int first_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
+	//aniello end
 	/////////////////////
 	if( !m_Interface.CreateDispatch(L"Rhino4.Interface", 0) )
       AfxMessageBox( L"Unable to create Rhino4.Interface Object." );
@@ -171,9 +178,11 @@ void DialogPrincipale::OnBnClickedButton1()
 			//RhinoScript.GetCurveObject(COleVariant (L"prova"), COleVariant (m),COleVariant (n));
 			//RhinoScript.GetString(COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE) );
 			RhinoScript.AddCircle( var_xy_plane, COleVariant((long)13) );
-			COleVariant ccc = RhinoScript.GetCurveObject(COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE));
-			RhinoScript.ExtendCurveLength(ccc,COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE));
+			//COleVariant ccc = RhinoScript.GetCurveObject(COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE));
+			//RhinoScript.ExtendCurveLength(ccc,COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE));
 			RhinoScript.ReleaseDispatch();
+			
+			RhinoApp().RunScript( L"_-Line 0,0,0 10,10,0", 0 );
 
 			///////////////////////////
 			
@@ -250,8 +259,9 @@ void DialogPrincipale::OnBnClickedButton1()
 			// Fillet at the end points of the line curves
 			double curve0_t = crv0->Domain().Max();
 			double curve1_t = curve1.Domain().Max();
-
-
+			
+			
+			/*
 			if( RhinoGetFilletPoints(curve1,  *crv0, antRad, curve0_t, curve1_t, t0, t1, plane) )
 			{
 				// Trim back the two line curves
@@ -272,12 +282,13 @@ void DialogPrincipale::OnBnClickedButton1()
 				ON_Plane fillet_plane( plane.Origin(), radial0, radial1 );
 				ON_Arc fillet( fillet_plane, plane.Origin(), antRad, angle );
 		 
-				/*ADD THE GEOMETRY*/ 
+				//ADD THE GEOMETRY
 				m_doc.AddCurveObject( curve1 );
 				m_doc.ReplaceObject(objref, *crv0 );
 				m_doc.AddCurveObject( fillet );
 				m_doc.Redraw();
 			}
+			*/
 
 			//t0 = 0.0, t1 = 0.0;
 			///*FILLET AT THE END POINTS OF THE LINE CURVES*/
@@ -310,7 +321,52 @@ void DialogPrincipale::OnBnClickedButton1()
 			//	m_doc.AddCurveObject( fillet );
 			//	m_doc.Redraw();
 			//}
+// aniello begin
+// Get the next runtime object serial number after scripting
+  unsigned int next_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
+ 
+  // Enable redrawing
+  CRhinoView::EnableDrawing( TRUE );
+ 
+  // if the two are the same, then nothing happened
+  if( first_sn == next_sn )
+    //return CRhinoCommand::nothing;
+	return;
+ 
+  // The the pointers of all of the objects that were added during scripting
+  ON_SimpleArray<const CRhinoObject*> objects;
+  for( unsigned int sn = first_sn; sn < next_sn; sn++ )
+  {
+    const CRhinoObject* obj = m_doc.LookupObjectByRuntimeSerialNumber( sn );
+    if( obj && !obj->IsDeleted() )
+      objects.Append( obj );
+  }
+ 
+  /*
+  // Sort and cull the list, as there may be duplicates
+  if( objects.Count() > 1 )
+  {
+    objects.HeapSort( CompareObjectPtr );
+    const CRhinoObject* last_obj = objects[objects.Count()-1];
+    for( int i = objects.Count()-2; i >= 0; i-- )
+    {
+      const CRhinoObject* prev_obj = objects[i];
+      if( last_obj == prev_obj )
+        objects.Remove(i);
+      else
+        last_obj = prev_obj;
+    }
+  }
+	*/
 
+  // Do something with the list...
+  for( int i = 0; i < objects.Count(); i++ )
+  {
+    const CRhinoObject* obj = objects[i];
+    if( obj->IsSelectable(true) )
+      obj->Select( true );
+  }
+//aniello end
 			m_doc.AddCurveObject( curve0 );
 			m_doc.Redraw();
 
