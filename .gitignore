@@ -44,7 +44,6 @@ local.properties
 # Build results
 [Dd]ebug/
 [Rr]elease/
-# adding for rhino by nello
 PseudoDebug/
 *_i.c
 *_p.c
