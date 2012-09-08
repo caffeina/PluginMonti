@@ -64,39 +64,10 @@ void DialogPrincipale::OnCbnSelchangeCombo5()
 
 void DialogPrincipale::OnBnClickedButton1()
 {	
-	//aniello gegin
-	// Disable redrawing
-  CRhinoView::EnableDrawing( FALSE );
- 
-  // Get the next runtime object serial number before scripting
-  unsigned int first_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
-	//aniello end
-	/////////////////////
-	if( !m_Interface.CreateDispatch(L"Rhino4.Interface", 0) )
-      AfxMessageBox( L"Unable to create Rhino4.Interface Object." );
 	
-	COleVariant var;
-    var = m_Interface.GetScriptObject();
+	
 
-  if( var.vt != VT_DISPATCH )
-  {
-    AfxMessageBox( L"Unable to get RhinoScript Object." );
-  }
-
-  CRhinoScript RhinoScript;
-  RhinoScript.AttachDispatch( var.pdispVal, TRUE );
-
-  COleVariant var_xy_plane = RhinoScript.WorldXYPlane();
-  COleVariant var_yz_plane = RhinoScript.WorldYZPlane();
-  COleVariant var_zx_plane = RhinoScript.WorldZXPlane();
-
-  RhinoScript.AddCircle( var_xy_plane, COleVariant((long)5) );
-  RhinoScript.AddCircle( var_yz_plane, COleVariant((long)10) );
-  RhinoScript.AddCircle( var_zx_plane, COleVariant((long)15) );
-
-  RhinoScript.DocumentModified( COleVariant(VARIANT_FALSE) );
-
-  RhinoScript.ReleaseDispatch();
+ 
 	////////////////////////
   /*GET THE LAYER NAME*/
   CRhinoGetString gs;
@@ -155,7 +126,16 @@ void DialogPrincipale::OnBnClickedButton1()
 			// m_doc.Redraw();
 		 //}
 		 /********************************************************************/
-		 CRhinoGetObject gc;
+		 //aniello gegin
+	// Disable redrawing
+  //CRhinoView::EnableDrawing( FALSE ); meglio tenerlo disabilitato altrimenti la schermata non si aggiorna.
+ 
+  // Get the next runtime object serial number before scripting
+  unsigned int first_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
+	//aniello end
+	/////////////////////
+		  
+		  CRhinoGetObject gc;
 		 gc.SetCommandPrompt( L"SELECT LINE TO EXTEND" );
          gc.SetGeometryFilter( CRhinoGetObject::curve_object );
          gc.GetObjects( 1, 1 );
@@ -164,30 +144,9 @@ void DialogPrincipale::OnBnClickedButton1()
 			const CRhinoObjRef& objref = gc.Object(0);
             const ON_Curve* pC = ON_Curve::Cast( objref.Geometry() );
 			ON_Curve* crv0 = pC->DuplicateCurve();
-			////////////////////
-			RhinoScript.AttachDispatch( var.pdispVal, TRUE );
-			RhinoScript.AddCircle( var_xy_plane, COleVariant((long)60) );
-			//COleVariant CURVA = crv0;
-			//RhinoScript.ExtendCurveLength(crv0,CRhinoExtend::Line,1,5);
-			RhinoScript.DocumentModified( COleVariant(VARIANT_FALSE) );
-
-			RhinoScript.ReleaseDispatch();
-
-			///
-			RhinoScript.AttachDispatch( var.pdispVal, TRUE );
-			//RhinoScript.GetCurveObject(COleVariant (L"prova"), COleVariant (m),COleVariant (n));
-			//RhinoScript.GetString(COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE) );
-			RhinoScript.AddCircle( var_xy_plane, COleVariant((long)13) );
-			//COleVariant ccc = RhinoScript.GetCurveObject(COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE));
-			//RhinoScript.ExtendCurveLength(ccc,COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE),COleVariant(VARIANT_FALSE));
-			RhinoScript.ReleaseDispatch();
 			
-			RhinoApp().RunScript( L"_-Line 0,0,0 10,10,0", 0 );
-
-			///////////////////////////
-			
-			//bool rc0 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 1, 5);
-			//bool rc1 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 0, 15);
+			bool rc0 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 1, 5);
+			bool rc1 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 0, 15);
 			m_doc.ReplaceObject(objref, *crv0 );
             m_doc.Redraw();
 
@@ -196,33 +155,43 @@ void DialogPrincipale::OnBnClickedButton1()
             ON_3dPoint p1 = crv0->PointAtEnd();
  
 			CRhinoGetNumber gn;
-			gn.SetCommandPrompt( L"ENTER ANTERIOR ANGLE FOR EXTENSION : " );
-			gn.SetCommandPromptDefault(L"30°");
+			//double default_value = 30;
+			gn.SetCommandPrompt( L"ENTER ANTERIOR ANGLE FOR EXTENSION in grad: " );
+			gn.SetCommandPromptDefault(L"30");
+			gn.SetDefaultNumber(30);
+			//gn.AcceptNothing(true);
 			gn.GetNumber();
 			double alphaAngle = gn.Number();
+			
+			
 
-			gn.SetCommandPrompt( L"ENTER ANTERIOR LENGTH FOR EXTENSION : " );
-			gn.SetCommandPromptDefault(L"80mm");
+			gn.SetCommandPrompt( L"ENTER ANTERIOR LENGTH FOR EXTENSION in mm: " );
+			gn.SetCommandPromptDefault(L"80");
+			gn.SetDefaultNumber(80);
 			gn.GetNumber();
 			double antLen = gn.Number();
 
-			gn.SetCommandPrompt( L"ENTER ANTERIOR FILLET RADIUS : " );
-			gn.SetCommandPromptDefault(L"6mm");
+			gn.SetCommandPrompt( L"ENTER ANTERIOR FILLET RADIUS in mm: " );
+			gn.SetCommandPromptDefault(L"6");
+			gn.SetDefaultNumber(6);
 			gn.GetNumber();
 			double antRad = gn.Number();
 
-			gn.SetCommandPrompt( L"ENTER POSTERIOR ANGLE FOR EXTENSION : " );
-			gn.SetCommandPromptDefault(L"ALPHA + 10°");
+			gn.SetCommandPrompt( L"ENTER POSTERIOR ANGLE FOR EXTENSION default <ALPHA + 10°= 40°> : " );
+			gn.SetCommandPromptDefault(L"40");
+			gn.SetDefaultNumber(40);
 			gn.GetNumber();
 			double betaAngle = gn.Number();
 
-			gn.SetCommandPrompt( L"ENTER POSTERIOR LENGTH FOR EXTENSION : " );
-			gn.SetCommandPromptDefault(L"80mm");
+			gn.SetCommandPrompt( L"ENTER POSTERIOR LENGTH FOR EXTENSION in mm: " );
+			gn.SetCommandPromptDefault(L"80");
+			gn.SetDefaultNumber(80);
 			gn.GetNumber();
 			double posLen = gn.Number();
 
-			gn.SetCommandPrompt( L"ENTER POSTERIOR FILLET RADIUS : " );
-			gn.SetCommandPromptDefault(L"13mm");
+			gn.SetCommandPrompt( L"ENTER POSTERIOR FILLET RADIUS in mm: " );
+			gn.SetCommandPromptDefault(L"13");
+			gn.SetDefaultNumber(13);
 			gn.GetNumber();
 			double posRad = gn.Number();
 
@@ -261,7 +230,7 @@ void DialogPrincipale::OnBnClickedButton1()
 			double curve1_t = curve1.Domain().Max();
 			
 			
-			/*
+			
 			if( RhinoGetFilletPoints(curve1,  *crv0, antRad, curve0_t, curve1_t, t0, t1, plane) )
 			{
 				// Trim back the two line curves
@@ -288,7 +257,7 @@ void DialogPrincipale::OnBnClickedButton1()
 				m_doc.AddCurveObject( fillet );
 				m_doc.Redraw();
 			}
-			*/
+			
 
 			//t0 = 0.0, t1 = 0.0;
 			///*FILLET AT THE END POINTS OF THE LINE CURVES*/
@@ -326,7 +295,7 @@ void DialogPrincipale::OnBnClickedButton1()
   unsigned int next_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
  
   // Enable redrawing
-  CRhinoView::EnableDrawing( TRUE );
+  //CRhinoView::EnableDrawing( TRUE );
  
   // if the two are the same, then nothing happened
   if( first_sn == next_sn )
