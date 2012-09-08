@@ -267,10 +267,10 @@ void DialogPrincipale::OnBnClickedButton1()
 			if( RhinoGetFilletPoints(curve0, *crv0, posRad, curve0_t, curve1_t, t0, t1, plane) )
 			{
 				// Trim back the two line curves
-				ON_Interval domain0( curve0.Domain().Min(), t0 );
+				ON_Interval domain0( curve0.Domain().Min(), t1 );
 				curve0.Trim( domain0 );
 		 
-				ON_Interval domain1( crv0->Domain().Max(), t1 );
+				ON_Interval domain1( crv0->Domain().Max(), t0 );
 				crv0->Trim( domain1 );
 		 
 				// Compute the fillet curve
