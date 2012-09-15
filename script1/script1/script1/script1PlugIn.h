@@ -35,7 +35,7 @@ public:
   bool IsDlgVisible();
   bool SetDlgVisible();
   bool SetDlgHidden();
-  bool DisplayDlg(CRhinoDoc& m_doc);
+  bool DisplayDlg(); // tolto CRhinoDoc& m_doc
   void DestroyDlg();
   void ZeroDlg();
   void SetDlgPointValue( int item, const ON_3dPoint& pt );

@@ -215,7 +215,7 @@ bool Cscript1PlugIn::SetDlgHidden()
   return rc;
 }
 
-bool Cscript1PlugIn::DisplayDlg(CRhinoDoc& m_doc)
+bool Cscript1PlugIn::DisplayDlg()// tolto parametro CRhinoDoc& m_doc
 {
 	AFX_MANAGE_STATE( AfxGetStaticModuleState() );
 
@@ -227,7 +227,7 @@ bool Cscript1PlugIn::DisplayDlg(CRhinoDoc& m_doc)
     return true;
   }
 
-	m_dialog = new DialogPrincipale( CWnd::FromHandle(RhinoApp().MainWnd()), m_doc);
+	m_dialog = new DialogPrincipale( CWnd::FromHandle(RhinoApp().MainWnd()) ); // tolto m_doc come parametro
 	if( m_dialog->Create(IDD_DIALOG1, CWnd::FromHandle(RhinoApp().MainWnd())) )
 	{
 		m_dialog->ShowWindow( SW_SHOW );
