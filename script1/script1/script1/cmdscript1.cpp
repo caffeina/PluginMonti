@@ -144,7 +144,7 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
   gs.GetString();
   if( gs.CommandResult() != CRhinoCommand::success )
   {
-	  exit(-1);
+	  exit(-1); // e' brutto qui. se premi esc crasha.
   }
   /*VALIDATE THE STRING*/
   ON_wString layer_name = gs.String();

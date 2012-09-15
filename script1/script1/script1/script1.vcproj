@@ -332,7 +332,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\Downloads\TestScript\VariantUtilities.cpp"
+				RelativePath=".\VariantUtilities.cpp"
 				>
 			</File>
 		</Filter>
@@ -378,7 +378,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\Downloads\TestScript\VariantUtilities.h"
+				RelativePath=".\VariantUtilities.h"
 				>
 			</File>
 		</Filter>
