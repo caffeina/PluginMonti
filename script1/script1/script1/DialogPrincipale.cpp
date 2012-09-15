@@ -65,7 +65,7 @@ void DialogPrincipale::OnCbnSelchangeCombo5()
 void DialogPrincipale::OnBnClickedButton1()
 {	
 	
-	
+	 RhinoApp().RunScript( L"! _GenPianoVis", 0 );
 
  
 }/*CHIUSURA DIALOGPRINCIPALE::ONBNCLICKEDBUTTON1*/
