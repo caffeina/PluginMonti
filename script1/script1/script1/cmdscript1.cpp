@@ -162,6 +162,7 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
   if( layer_index < 0 )
   {
     RhinoApp().Print( L"LAYER \"%s\" DOES NOT EXIST.\n", layer_name );
+	
   }
   else
   {
@@ -362,10 +363,64 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 				context.m_doc.AddCurveObject( fillet );
 				context.m_doc.Redraw();
 			}
+			
+			// code temp
+			// aniello begin
+// Get the next runtime object serial number after scripting
+  unsigned int next_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
+
+ 
+  // Enable redrawing
+  //CRhinoView::EnableDrawing( TRUE );
+ 
+  // if the two are the same, then nothing happened
+ /* if( first_sn == next_sn )
+    //return CRhinoCommand::nothing;
+	return;
+*/ //commento questo per far compilare :-)
+ 
+  // The the pointers of all of the objects that were added during scripting
+  ON_SimpleArray<const CRhinoObject*> objects;
+  for( unsigned int sn = first_sn; sn < next_sn; sn++ )
+  {
+    const CRhinoObject* obj = context.m_doc.LookupObjectByRuntimeSerialNumber( sn );
+    if( obj && !obj->IsDeleted() )
+      objects.Append( obj );
+  }
+ 
+  /*
+  // Sort and cull the list, as there may be duplicates
+  if( objects.Count() > 1 )
+  {
+    objects.HeapSort( CompareObjectPtr );
+    const CRhinoObject* last_obj = objects[objects.Count()-1];
+    for( int i = objects.Count()-2; i >= 0; i-- )
+    {
+      const CRhinoObject* prev_obj = objects[i];
+     if( last_obj == prev_obj )
+        objects.Remove(i);
+      else
+        last_obj = prev_obj;
+    }
+  }
+	*/
+  // Do something with the list...
+  for( int i = 0; i < objects.Count(); i++ )
+  {
+    const CRhinoObject* obj = objects[i];
+    if( obj->IsSelectable(true) )
+      obj->Select( true );
+  }
+//aniello end
+			
+			context.m_doc.AddCurveObject( curve0 );
+			context.m_doc.Redraw();
 			/*CLEAN UP OR LEAK*/ 
 			delete crv0;
 			crv0 = 0;
 
+
+			//end code temp
 			/*JOIN LINES TOGETHER*/
 			CRhinoGetObject go;
 			go.SetCommandPrompt( L"Select objects to group" );
@@ -422,3 +477,4 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 
   return CRhinoCommand::success;
 }
+

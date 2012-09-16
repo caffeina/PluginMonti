@@ -39,6 +39,7 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO2, &DialogPrincipale::OnCbnSelchangeCombo2)
 	ON_EN_CHANGE(IDC_EDIT2, &DialogPrincipale::OnEnChangeEdit2)
 	ON_BN_CLICKED(IDOK, &DialogPrincipale::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_BUTTON2, &DialogPrincipale::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -93,4 +94,17 @@ void DialogPrincipale::OnBnClickedOk()
 {
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 	OnOK();
+}
+
+void DialogPrincipale::OnBnClickedButton2()
+{
+	//ON_wString my_string;
+	
+	
+	
+	//CRhinoFileMenu().FileSaveAs(my_string,false,false,false);
+	
+	//RhinoApp().FileSaveAs( my_string);
+	
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }

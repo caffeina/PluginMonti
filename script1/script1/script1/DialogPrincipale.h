@@ -42,4 +42,6 @@ public:
 	int ValoreDisassamento;
 	//CRhinoDoc& m_doc; tolto m_doc
 	afx_msg void OnBnClickedOk();
+public:
+	afx_msg void OnBnClickedButton2();
 };

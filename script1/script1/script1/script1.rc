@@ -93,6 +93,7 @@ BEGIN
     CTEXT           "X",IDC_STATIC,284,175,8,8
     CTEXT           "Y",IDC_STATIC,284,207,8,8
     CTEXT           "Z",IDC_STATIC,284,239,8,8
+    PUSHBUTTON      "FileSaveAs",IDC_BUTTON2,288,60,50,14
 END
 
 
