@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "DialogPrincipale.h"
+#include "Resource.h"
 
 
 // finestra di dialogo DialogPrincipale
@@ -31,8 +32,7 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
-	ON_BN_CLICKED(IDCANCEL, &DialogPrincipale::OnBnClickedCancel)
-	
+	ON_BN_CLICKED(IDCANCEL, &DialogPrincipale::OnBnClickedCancel)	
 	ON_CBN_SELCHANGE(IDC_COMBO1, &DialogPrincipale::OnCbnSelchangeCombo1)
 	ON_CBN_SELCHANGE(IDC_COMBO5, &DialogPrincipale::OnCbnSelchangeCombo5)
 	ON_BN_CLICKED(IDC_BUTTON1, &DialogPrincipale::OnBnClickedButton1)

@@ -144,14 +144,14 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
   gs.GetString();
   if( gs.CommandResult() != CRhinoCommand::success )
   {
-	  exit(-1); // e' brutto qui. se premi esc crasha.
+	  return gs.CommandResult();
   }
   /*VALIDATE THE STRING*/
   ON_wString layer_name = gs.String();
   layer_name.TrimLeftAndRight();
   if( layer_name.IsEmpty() )
   {
-	  exit(-1);
+	  return CRhinoCommand::cancel;
   }
     
   /*GET A REFERENCE TO THE LAYER TABLE*/
@@ -196,15 +196,15 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 		 //}
 		 /********************************************************************/
 		 //aniello gegin
-	// Disable redrawing
-  //CRhinoView::EnableDrawing( FALSE ); meglio tenerlo disabilitato altrimenti la schermata non si aggiorna.
+		 // Disable redrawing
+		 //CRhinoView::EnableDrawing( FALSE ); meglio tenerlo disabilitato altrimenti la schermata non si aggiorna.
  
-  // Get the next runtime object serial number before scripting
-  unsigned int first_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
-	//aniello end
-	/////////////////////
+         // Get the next runtime object serial number before scripting
+		 unsigned int first_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
+	     //aniello end
+	     /////////////////////
 		  
-		  CRhinoGetObject gc;
+		 CRhinoGetObject gc;
 		 gc.SetCommandPrompt( L"SELECT LINE TO EXTEND" );
          gc.SetGeometryFilter( CRhinoGetObject::curve_object );
          gc.GetObjects( 1, 1 );
@@ -291,31 +291,31 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 
 
 			/*CREATE THE LINE CURVES TO FILLET*/ 
-			ON_LineCurve curve0( pointStart, point0 ); // a sinistra in front view
-			ON_LineCurve curve1( point1, pointEnd ); // a destra in front view
+			ON_LineCurve curve0( pointStart, point0 ); //LINEA A SINISTRA IN FRONT VIEW
+			ON_LineCurve curve1( point1, pointEnd );   //LINEA A DESTRA IN FRONT VIEW 
 
 			
 			
-			// Fillet at the end points of the line curves
+			/*FILLET AT THE END/START POINTS OF THE LINE CURVES*/ 
 			double curve0_t = crv0->Domain().Max();
-			double curve1_t = curve1.Domain().Max();
+			double curve1_t = curve1.Domain().Min();
 			
 			
 			
-			if( RhinoGetFilletPoints(curve1,  *crv0, antRad, curve0_t, curve1_t, t0, t1, plane) )
+			if( RhinoGetFilletPoints(curve1,  *crv0, antRad, curve1_t, curve0_t, t1, t0, plane) )
 			{
-				// Trim back the two line curves
-				ON_Interval domain0( curve1.Domain().Max(), t0 );
-				curve1.Trim( domain0 );
+				/*TRIM BACK THE TWO LINE CURVES*/ 
+				ON_Interval domain1( curve1.Domain().Min(), t1 );
+				curve1.Trim( domain1 );
 		 
-				ON_Interval domain1( crv0->Domain().Max(), t1 );
-				crv0->Trim( domain1 );
+				ON_Interval domain0( crv0->Domain().Min(), t0 );
+				crv0->Trim( domain0 );
 		 
-				// Compute the fillet curve
-				ON_3dVector radial0 = curve1.PointAt(t0) - plane.Origin();
+				/*COMPUTE THE FILLET CURVE*/ 
+				ON_3dVector radial0 = curve1.PointAt(t1) - plane.Origin();
 				radial0.Unitize();
 		 
-				ON_3dVector radial1 = crv0->PointAt(t1) - plane.Origin();
+				ON_3dVector radial1 = crv0->PointAt(t0) - plane.Origin();
 				radial1.Unitize();
 		 
 				double angle = acos( radial0 * radial1 );
@@ -331,25 +331,25 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 			
 
 			t0 = 0.0, t1 = 0.0;
-			//*FILLET AT THE END POINTS OF THE LINE CURVES
-			curve0_t = crv0->Domain().Max();
+			/*FILLET AT THE START POINTS OF THE LINE CURVES*/
+			curve0_t = crv0->Domain().Min();
 			curve1_t = curve0.Domain().Min();
 
-			if( RhinoGetFilletPoints(curve0, *crv0, posRad, curve0_t, curve1_t, t0, t1, plane) )
+			if( RhinoGetFilletPoints(curve0, *crv0, posRad, curve1_t, curve0_t, t1, t0, plane) )
 			{
 				// Trim back the two line curves
-				ON_Interval domain0( curve0.Domain().Max(), t1 );
+				ON_Interval domain0( t1, curve0.Domain().Max() );
 				curve0.Trim( domain0 );
 		 
-				ON_Interval domain1( crv0->Domain().Min(), t0 );
+				ON_Interval domain1( t0, crv0->Domain().Max() );
 				crv0->Trim( domain1 );
 				
 
-				// Compute the fillet curve
-				ON_3dVector radial0 = curve0.PointAt(t0) - plane.Origin();
+				/*COMPUTE THE FILLET CURVE*/ 
+				ON_3dVector radial0 = curve0.PointAt(t1) - plane.Origin();
 				radial0.Unitize();
 		 
-				ON_3dVector radial1 = crv0->PointAt(t1) - plane.Origin();
+				ON_3dVector radial1 = crv0->PointAt(t0) - plane.Origin();
 				radial1.Unitize();
 		 
 				double angle = acos( radial0 * radial1 );
@@ -362,76 +362,63 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 				context.m_doc.AddCurveObject( fillet );
 				context.m_doc.Redraw();
 			}
-// aniello begin
-// Get the next runtime object serial number after scripting
-  unsigned int next_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
- 
-  // Enable redrawing
-  //CRhinoView::EnableDrawing( TRUE );
- 
-  // if the two are the same, then nothing happened
- /* if( first_sn == next_sn )
-    //return CRhinoCommand::nothing;
-	return;
-*/ //commento questo per far compilare :-)
- 
-  // The the pointers of all of the objects that were added during scripting
-  ON_SimpleArray<const CRhinoObject*> objects;
-  for( unsigned int sn = first_sn; sn < next_sn; sn++ )
-  {
-    const CRhinoObject* obj = context.m_doc.LookupObjectByRuntimeSerialNumber( sn );
-    if( obj && !obj->IsDeleted() )
-      objects.Append( obj );
-  }
- 
-  /*
-  // Sort and cull the list, as there may be duplicates
-  if( objects.Count() > 1 )
-  {
-    objects.HeapSort( CompareObjectPtr );
-    const CRhinoObject* last_obj = objects[objects.Count()-1];
-    for( int i = objects.Count()-2; i >= 0; i-- )
-    {
-      const CRhinoObject* prev_obj = objects[i];
-      if( last_obj == prev_obj )
-        objects.Remove(i);
-      else
-        last_obj = prev_obj;
-    }
-  }
-	*/
-
-  // Do something with the list...
-  for( int i = 0; i < objects.Count(); i++ )
-  {
-    const CRhinoObject* obj = objects[i];
-    if( obj->IsSelectable(true) )
-      obj->Select( true );
-  }
-//aniello end
-			context.m_doc.AddCurveObject( curve0 );
-			context.m_doc.Redraw();
-
 			/*CLEAN UP OR LEAK*/ 
 			delete crv0;
 			crv0 = 0;
-			int R = 0;
+
+			/*JOIN LINES TOGETHER*/
+			CRhinoGetObject go;
+			go.SetCommandPrompt( L"Select objects to group" );
+			go.EnableGroupSelect();
+			go.GetObjects(1,0);
+			if( go.CommandResult() != CRhinoCommand::success )
+			{
+				return go.CommandResult();
+			}
+			 
+			int i = 0, count = go.ObjectCount();
+			ON_SimpleArray<const CRhinoObject*> members( count );
+			 
+			for( i = 0; i < count; i++ )
+			{
+				members.Append( go.Object(i).Object() );
+			}
+			 
+			int index = context.m_doc.m_group_table.AddGroup( ON_Group(), members );
+			context.m_doc.Redraw();
+			//return (index >= 0) ? CRhinoCommand::success : CRhinoCommand::failure;
+
+			ON_3dPoint center_point( 0.0, 0.0, 0.0 );
+			double radius = 63.5;
+			ON_3dPoint height_point( 0.0, 0.0, 140.0 );
+			ON_3dVector zaxis = height_point - center_point;
+			ON_Plane planeCir( center_point, zaxis );
+
+			/*ADD CIRCLE FOR CYLINDER'S BASE*/
+			ON_Circle circle( planeCir, radius );
+
+			/*ADD CYLINDER*/
+			ON_Cylinder cylinder( circle, zaxis.Length() );
+			ON_Brep* brep = ON_BrepCylinder( cylinder, TRUE, TRUE );
+			if( brep )
+			{
+				CRhinoBrepObject* cylinder_object = new CRhinoBrepObject();
+				cylinder_object->SetBrep( brep );
+				if( context.m_doc.AddObject(cylinder_object) )
+				{
+					context.m_doc.Redraw();
+				}
+				else
+				{
+					delete cylinder_object;
+				}
+			}
+
+			
+
 	     }
 	  }/*CHIUSURA IF( OBJECT_COUNT > 0 )*/
   }/*CHIUSURA ELSE*/
-	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
-
-
-	//end code command
-  Cscript1PlugIn& plugin = script1PlugIn();
-
-  bool bVisible = plugin.IsDlgVisible();
-
-  if( context.IsInteractive() )
-  {
-    if( false == bVisible )
-		plugin.DisplayDlg(); 
-  }
 
   return CRhinoCommand::success;
 }
