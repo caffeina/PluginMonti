@@ -14,6 +14,7 @@ public:
 
 // Dati della finestra di dialogo
 	enum { IDD = IDD_DIALOG1 };
+	CComboBox m_comboAltTacco;
 
 	//void SetPointValue( int item, const ON_3dPoint& pt );
 	void KillDialog();
@@ -24,8 +25,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	
-	afx_msg void OnBnClickedCancel();
-	
+	afx_msg void OnBnClickedCancel();	
 	afx_msg void OnCbnSelchangeCombo1();
 	afx_msg void OnCbnSelchangeCombo5();
 	afx_msg void OnBnClickedButton1();
@@ -39,9 +39,11 @@ protected:
 public:
 	
 	// valore disassamento. inseriti il valore massimo e minimo.
-	int ValoreDisassamento;
+	int VAR_Valore_Disassamento;
+
 	//CRhinoDoc& m_doc; tolto m_doc
 	afx_msg void OnBnClickedOk();
-public:
-	afx_msg void OnBnClickedButton2();
+	afx_msg void OnEnChangeEdit3();
+	afx_msg void OnCbnSelchangeCmbaltezzatacco();
+	CString VAR_Altezza_Tacco;
 };

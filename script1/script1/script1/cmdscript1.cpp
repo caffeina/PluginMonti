@@ -7,6 +7,8 @@
 #include "DialogPrincipale.h"
 #include "afxwin.h"
 #include "script1App.h"
+#include "atlstr.h"
+
 
 
 ////////////////////////////////////////////////////////////////
@@ -136,8 +138,14 @@ static class CGenPianoVis theGenPianoVisCommand;
 CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& context )
 {
 
-	
-	////////////////////////
+  Cscript1PlugIn& plugin = script1PlugIn();
+
+  if( !plugin.IsDlgVisible() )
+  {
+    return CRhinoCommand::nothing;
+  }
+
+
   /*GET THE LAYER NAME*/
   CRhinoGetString gs;
   gs.SetCommandPrompt( L"NAME OF LAYER WHICH CONTAINS VISIONAL PLANE : " );
@@ -445,7 +453,15 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 
 			ON_3dPoint center_point( 0.0, 0.0, 0.0 );
 			double radius = 63.5;
-			ON_3dPoint height_point( 0.0, 0.0, 140.0 );
+			int __count = plugin.m_dialog->m_comboAltTacco.GetCount();
+
+			int nIndex = plugin.m_dialog->m_comboAltTacco.GetCurSel();
+			CString strCBText;
+			plugin.m_dialog->m_comboAltTacco.GetLBText( nIndex, strCBText);
+			int height = _wtoi(strCBText);
+
+
+			ON_3dPoint height_point( 0.0, 0.0, height);
 			ON_3dVector zaxis = height_point - center_point;
 			ON_Plane planeCir( center_point, zaxis );
 

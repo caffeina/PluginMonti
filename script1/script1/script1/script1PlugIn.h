@@ -40,7 +40,11 @@ public:
   void ZeroDlg();
   void SetDlgPointValue( int item, const ON_3dPoint& pt );
 
-private:
+  /*DEFINIZIONE PROPRIETÀ*/
+  void setVarAltezzaTacco(CString);
+  int  getVarAltezzaTacco(void);
+
+public:
   ON_wString m_plugin_version;
   DialogPrincipale* m_dialog;
 

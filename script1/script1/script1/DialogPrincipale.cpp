@@ -10,10 +10,10 @@
 
 IMPLEMENT_DYNAMIC(DialogPrincipale, CDialog)
 
-DialogPrincipale::DialogPrincipale(CWnd* pParent)  //tolto CRhinoDoc& doc
-	: CRhinoDialog(DialogPrincipale::IDD, pParent)  // cambiato CDialog
-	, ValoreDisassamento(0) //tolto m_doc(doc)
-	
+DialogPrincipale::DialogPrincipale(CWnd* pParent)
+	: CRhinoDialog(DialogPrincipale::IDD, pParent)  
+	, VAR_Valore_Disassamento(0) 
+	, VAR_Altezza_Tacco(_T(""))
 {
 }
 
@@ -25,9 +25,10 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 
-
-	DDX_Text(pDX, IDC_EDIT2, ValoreDisassamento);
-	DDV_MinMaxInt(pDX, ValoreDisassamento, -12, +12);
+	DDX_Text(pDX, IDC_EDIT2, VAR_Valore_Disassamento);
+	DDV_MinMaxInt(pDX, VAR_Valore_Disassamento, -12, +12);
+	DDX_CBString(pDX, IDC_CMBAltezzaTacco, VAR_Altezza_Tacco);
+	DDX_Control(pDX, IDC_CMBAltezzaTacco, m_comboAltTacco);
 }
 
 
@@ -39,7 +40,8 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO2, &DialogPrincipale::OnCbnSelchangeCombo2)
 	ON_EN_CHANGE(IDC_EDIT2, &DialogPrincipale::OnEnChangeEdit2)
 	ON_BN_CLICKED(IDOK, &DialogPrincipale::OnBnClickedOk)
-	ON_BN_CLICKED(IDC_BUTTON2, &DialogPrincipale::OnBnClickedButton2)
+	ON_EN_CHANGE(IDC_EDIT3, &DialogPrincipale::OnEnChangeEdit3)
+	ON_CBN_SELCHANGE(IDC_CMBAltezzaTacco, &DialogPrincipale::OnCbnSelchangeCmbaltezzatacco)
 END_MESSAGE_MAP()
 
 
@@ -96,15 +98,18 @@ void DialogPrincipale::OnBnClickedOk()
 	OnOK();
 }
 
-void DialogPrincipale::OnBnClickedButton2()
+void DialogPrincipale::OnEnChangeEdit3()
 {
-	//ON_wString my_string;
-	
-	
-	
-	//CRhinoFileMenu().FileSaveAs(my_string,false,false,false);
-	
-	//RhinoApp().FileSaveAs( my_string);
-	
+	// TODO:  Se si tratta di un controllo RICHEDIT, il controllo non
+	// invierà questa notifica a meno che non si esegua l'override della funzione CRhinoDialog::OnInitDialog()
+	// e venga eseguita la chiamata a CRichEditCtrl().SetEventMask()
+	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
+
+	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+void DialogPrincipale::OnCbnSelchangeCmbaltezzatacco()
+{
+	UpdateData(true);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }

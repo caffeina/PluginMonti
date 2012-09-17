@@ -254,11 +254,3 @@ void Cscript1PlugIn::ZeroDlg()
 {
   m_dialog = 0;
 }
-
-/*
-void Cscript1PlugIn::SetDlgPointValue( int item, const ON_3dPoint& pt )
-{
-  if( IsDlgVisible() )
-    m_dialog->SetPointValue( item, pt );
-}
-*/
