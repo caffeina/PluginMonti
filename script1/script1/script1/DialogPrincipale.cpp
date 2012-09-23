@@ -146,6 +146,7 @@ void DialogPrincipale::OnBnClickedRadio1()
 {	
 	UpdateData (TRUE);
 	StatusRadio7_Fondello_di_ferro = 0;
+	StatusRadio8_Fondello_di_alluminio = -1;
 	UpdateData (FALSE);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
@@ -160,6 +161,10 @@ void DialogPrincipale::OnBnClickedRadio2()
 {
 	UpdateData (TRUE);
 	GetDlgItem(IDC_EDIT2)->EnableWindow(TRUE);
+	StatusRadio8_Fondello_di_alluminio = 0;
+	StatusRadio7_Fondello_di_ferro = -1;
+	UpdateData (FALSE);
+
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
