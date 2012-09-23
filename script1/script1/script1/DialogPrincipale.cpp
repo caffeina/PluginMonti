@@ -18,6 +18,7 @@ DialogPrincipale::DialogPrincipale(CWnd* pParent)
 	, StatusRadio3_Iniezione_Centrale(0)
 	, StatusRadio7_Fondello_di_ferro(0)
 	, ValIniezioneDisassamento(_T("+12"))
+	, ValoreAltezzaFondello(_T("20"))
 {
 }
 
@@ -40,6 +41,7 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO7, StatusRadio7_Fondello_di_ferro);
 	DDX_Radio(pDX, IDC_RADIO8, StatusRadio8_Fondello_di_alluminio);
 	DDX_CBString(pDX, IDC_COMBO1, ValIniezioneDisassamento);
+	DDX_CBString(pDX, IDC_COMBO5, ValoreAltezzaFondello);
 }
 
 
@@ -138,6 +140,7 @@ void DialogPrincipale::OnCbnSelchangeCmbaltezzatacco()
 void DialogPrincipale::OnBnClickedRadio3()
 {
 	UpdateData (TRUE);
+	GetDlgItem(IDC_EDIT3)->EnableWindow(FALSE);
 	
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
@@ -145,6 +148,7 @@ void DialogPrincipale::OnBnClickedRadio3()
 void DialogPrincipale::OnBnClickedRadio1()
 {	
 	UpdateData (TRUE);
+	GetDlgItem(IDC_EDIT2)->EnableWindow(FALSE);
 	StatusRadio7_Fondello_di_ferro = 0;
 	StatusRadio8_Fondello_di_alluminio = -1;
 	UpdateData (FALSE);

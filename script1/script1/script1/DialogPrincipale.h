@@ -71,4 +71,7 @@ public:
 public:
 	// valore iniezione (da non confondere dal dissasamento della spina) disassata, puo' essere +-12
 	CString ValIniezioneDisassamento;
+public:
+	// di default e' 20
+	CString ValoreAltezzaFondello;
 };
