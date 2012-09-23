@@ -26,6 +26,7 @@
 #define IDC_RADIO7999                   7026
 #define IDC_RADIO7                      7026
 #define IDC_RADIO8                      7027
+#define IDC_RICHEDIT21                  7034
 
 // Next default values for new objects
 // 
@@ -33,7 +34,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        7004
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         7034
+#define _APS_NEXT_CONTROL_VALUE         7035
 #define _APS_NEXT_SYMED_VALUE           7000
 #endif
 #endif

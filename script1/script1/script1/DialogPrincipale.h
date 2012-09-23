@@ -64,4 +64,11 @@ public:
 	afx_msg void OnBnClickedRadio4();
 public:
 	afx_msg void OnBnClickedRadio8();
+public:
+	afx_msg void OnBnClickedCheck1();
+public:
+	afx_msg void OnEnChangeRichedit21();
+public:
+	// valore iniezione (da non confondere dal dissasamento della spina) disassata, puo' essere +-12
+	CString ValIniezioneDisassamento;
 };

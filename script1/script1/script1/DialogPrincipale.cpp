@@ -13,10 +13,11 @@ IMPLEMENT_DYNAMIC(DialogPrincipale, CDialog)
 DialogPrincipale::DialogPrincipale(CWnd* pParent)
 	: CRhinoDialog(DialogPrincipale::IDD, pParent)  
 	, VAR_Valore_Disassamento(0) 
-	, VAR_Altezza_Tacco(_T(""))
+	, VAR_Altezza_Tacco(_T("140"))
 	, StatusRadio1_Centrale(0)
 	, StatusRadio3_Iniezione_Centrale(0)
 	, StatusRadio7_Fondello_di_ferro(0)
+	, ValIniezioneDisassamento(_T("+12"))
 {
 }
 
@@ -38,6 +39,7 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO4, StatusRadio4_Iniezione_Disassata);
 	DDX_Radio(pDX, IDC_RADIO7, StatusRadio7_Fondello_di_ferro);
 	DDX_Radio(pDX, IDC_RADIO8, StatusRadio8_Fondello_di_alluminio);
+	DDX_CBString(pDX, IDC_COMBO1, ValIniezioneDisassamento);
 }
 
 
@@ -57,6 +59,8 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_BN_CLICKED(IDC_RADIO2, &DialogPrincipale::OnBnClickedRadio2)
 	ON_BN_CLICKED(IDC_RADIO4, &DialogPrincipale::OnBnClickedRadio4)
 	ON_BN_CLICKED(IDC_RADIO8, &DialogPrincipale::OnBnClickedRadio8)
+	ON_BN_CLICKED(IDC_CHECK1, &DialogPrincipale::OnBnClickedCheck1)
+	ON_EN_CHANGE(IDC_RICHEDIT21, &DialogPrincipale::OnEnChangeRichedit21)
 END_MESSAGE_MAP()
 
 
@@ -72,6 +76,7 @@ void DialogPrincipale::OnBnClickedCancel()
 
 void DialogPrincipale::OnCbnSelchangeCombo1()
 {
+	UpdateData(true);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
@@ -133,6 +138,7 @@ void DialogPrincipale::OnCbnSelchangeCmbaltezzatacco()
 void DialogPrincipale::OnBnClickedRadio3()
 {
 	UpdateData (TRUE);
+	
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
@@ -153,12 +159,14 @@ void DialogPrincipale::OnBnClickedRadio7()
 void DialogPrincipale::OnBnClickedRadio2()
 {
 	UpdateData (TRUE);
+	GetDlgItem(IDC_EDIT2)->EnableWindow(TRUE);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
 void DialogPrincipale::OnBnClickedRadio4()
 {
 	UpdateData (TRUE);
+	GetDlgItem(IDC_EDIT3)->EnableWindow(TRUE);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
@@ -166,4 +174,30 @@ void DialogPrincipale::OnBnClickedRadio8()
 {
 	UpdateData (TRUE);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+void DialogPrincipale::OnBnClickedCheck1()
+{
+	
+	GetDlgItem(IDC_RADIO1)->EnableWindow(TRUE);
+	GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
+	GetDlgItem(IDC_RADIO3)->EnableWindow(TRUE);
+	GetDlgItem(IDC_RADIO4)->EnableWindow(TRUE);
+	GetDlgItem(IDC_RADIO7)->EnableWindow(TRUE);
+	GetDlgItem(IDC_RADIO8)->EnableWindow(TRUE);
+	GetDlgItem(IDC_COMBO1)->EnableWindow(TRUE);
+	
+	
+
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+void DialogPrincipale::OnEnChangeRichedit21()
+{
+	// TODO:  Se si tratta di un controllo RICHEDIT, il controllo non
+	// invierà questa notifica a meno che non si esegua l'override della funzione CRhinoDialog::OnInitDialog()
+	// e venga eseguita la chiamata a CRichEditCtrl().SetEventMask()
+	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
+
+	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
 }
