@@ -40,10 +40,28 @@ public:
 	
 	// valore disassamento. inseriti il valore massimo e minimo.
 	int VAR_Valore_Disassamento;
+	int StatusRadio1_Centrale;
+	int StatusRadio2_Dissasata;
+	int StatusRadio3_Iniezione_Centrale;
+	int StatusRadio4_Iniezione_Disassata;
+	int StatusRadio7_Fondello_di_ferro;
+	int StatusRadio8_Fondello_di_alluminio;
 
 	//CRhinoDoc& m_doc; tolto m_doc
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnEnChangeEdit3();
 	afx_msg void OnCbnSelchangeCmbaltezzatacco();
 	CString VAR_Altezza_Tacco;
+public:
+	afx_msg void OnBnClickedRadio3();
+public:
+	afx_msg void OnBnClickedRadio1();
+public:
+	afx_msg void OnBnClickedRadio7();
+public:
+	afx_msg void OnBnClickedRadio2();
+public:
+	afx_msg void OnBnClickedRadio4();
+public:
+	afx_msg void OnBnClickedRadio8();
 };
