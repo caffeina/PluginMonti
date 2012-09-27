@@ -74,4 +74,7 @@ public:
 public:
 	// di default e' 20
 	CString ValoreAltezzaFondello;
+public:
+	// variabile controllo check presenza tacco spina
+	CButton StatusCheckTaccoSpina;
 };

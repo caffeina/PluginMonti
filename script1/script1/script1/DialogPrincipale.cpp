@@ -42,6 +42,7 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO8, StatusRadio8_Fondello_di_alluminio);
 	DDX_CBString(pDX, IDC_COMBO1, ValIniezioneDisassamento);
 	DDX_CBString(pDX, IDC_COMBO5, ValoreAltezzaFondello);
+	DDX_Control(pDX, IDC_CHECK1, StatusCheckTaccoSpina);
 }
 
 
@@ -187,7 +188,7 @@ void DialogPrincipale::OnBnClickedRadio8()
 
 void DialogPrincipale::OnBnClickedCheck1()
 {
-	
+	if (CWnd::IsDlgButtonChecked(IDC_CHECK1) ) {
 	GetDlgItem(IDC_RADIO1)->EnableWindow(TRUE);
 	GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
 	GetDlgItem(IDC_RADIO3)->EnableWindow(TRUE);
@@ -195,6 +196,17 @@ void DialogPrincipale::OnBnClickedCheck1()
 	GetDlgItem(IDC_RADIO7)->EnableWindow(TRUE);
 	GetDlgItem(IDC_RADIO8)->EnableWindow(TRUE);
 	GetDlgItem(IDC_COMBO1)->EnableWindow(TRUE);
+	}
+	else {
+	GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
+	GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
+	GetDlgItem(IDC_RADIO3)->EnableWindow(FALSE);
+	GetDlgItem(IDC_RADIO4)->EnableWindow(FALSE);
+	GetDlgItem(IDC_RADIO7)->EnableWindow(FALSE);
+	GetDlgItem(IDC_RADIO8)->EnableWindow(FALSE);
+	GetDlgItem(IDC_COMBO1)->EnableWindow(FALSE);
+	}
+
 	
 	
 
