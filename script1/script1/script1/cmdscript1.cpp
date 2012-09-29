@@ -96,11 +96,9 @@ CRhinoCommand::result CCommandscript1::RunCommand( const CRhinoCommandContext& c
 ////////////////////////////////////////////////////////////////
 
 
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-//
-// BEGIN new command
-//
+/*******************/
+/*BEGIN NEW COMMAND*/
+/*******************/
 class CGenPianoVis : public CRhinoTestCommand
 {
 public:
@@ -371,9 +369,15 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 				context.m_doc.AddCurveObject( fillet );
 				context.m_doc.Redraw();
 			}
+			/******************/
+			/*CLEAN UP OR LEAK*/ 
+			/******************/
+			delete crv0;
+			crv0 = 0;
+
 			
 			// code temp
-			// aniello begin
+// aniello begin
 // Get the next runtime object serial number after scripting
   unsigned int next_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
 
@@ -420,18 +424,13 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
       obj->Select( true );
   }
 //aniello end
-			
-			context.m_doc.AddCurveObject( curve0 );
-			context.m_doc.Redraw();
-			/*CLEAN UP OR LEAK*/ 
-			delete crv0;
-			crv0 = 0;
-
+		
 
 			//end code temp
+            /*********************/
 			/*JOIN LINES TOGETHER*/
 			CRhinoGetObject go;
-			go.SetCommandPrompt( L"Select objects to group" );
+			go.SetCommandPrompt( L"SELECT OBJECTS TO GROUP" );
 			go.EnableGroupSelect();
 			go.GetObjects(1,0);
 			if( go.CommandResult() != CRhinoCommand::success )
@@ -448,9 +447,85 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 			}
 			 
 			int index = context.m_doc.m_group_table.AddGroup( ON_Group(), members );
-			context.m_doc.Redraw();
-			//return (index >= 0) ? CRhinoCommand::success : CRhinoCommand::failure;
+			context.m_doc.Redraw();			
 
+	     }
+	  }/*CHIUSURA IF( OBJECT_COUNT > 0 )*/
+  }/*CHIUSURA ELSE*/
+
+  return CRhinoCommand::success;
+}
+
+/***********************/
+/*BEGIN NEW COMMAND 2ND*/
+/***********************/
+class CGenCylinder : public CRhinoTestCommand
+{
+public:
+  // The one and only instance of CCommandscript1 is created below.
+  // No copy constructor or operator= is required.  Values of
+  // member variables persist for the duration of the application.
+
+  // CCommandscript1::CCommandscript1()
+  // is called exactly once when static thescript1Command is created.
+	CGenCylinder() {}
+
+  // CCommandscript1::~CCommandscript1()
+  // is called exactly once when static thescript1Command is
+  // destroyed.  The destructor should not make any calls to
+  // the Rhino SDK.  If your command has persistent settings,
+  // then override CRhinoCommand::SaveProfile and CRhinoCommand::LoadProfile.
+  ~CGenCylinder() {}
+
+  // Returns a unique UUID for this command.
+  // If you try to use an id that is already being used, then
+  // your command will not work.  Use GUIDGEN.EXE to make unique UUID.
+	UUID CommandUUID()
+	{
+		
+	static const GUID CGenCylinderCommand_UUID = 
+	{0x340e4824, 0x1cf2, 0x4f05, {0xbd, 0x74, 0xbb, 0xe7, 0x70, 0x12, 0xc1, 0x91}};
+	return CGenCylinderCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"GenCylinder"; }
+	const wchar_t* LocalCommandName() { return L"GenCylinder"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+static class CGenCylinder theCGenCylinderCommand;
+CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& context )
+{
+
+	Cscript1PlugIn& plugin = script1PlugIn();
+	if( !plugin.IsDlgVisible() )
+	{
+		return CRhinoCommand::nothing;
+	}
+
+	/*****************************************/
+	/*CHECKING IF THERE IS ALREADY A CYLINDER*/
+	/*****************************************/
+	const CRhinoLayer& layer = context.m_doc.m_layer_table.CurrentLayer();
+	ON_SimpleArray<CRhinoObject*> objects;
+	int object_count = context.m_doc.LookupObject( layer, objects );
+	if( object_count > 0 )
+	{
+		int brep_obj_count = 0;
+		const CRhinoObject* object = 0;
+		for(int i = 0; i < object_count; i++ )
+		{
+			object = objects[ i ];
+			/************************************/
+			/*TRY CASTING AS A RHINO BREP OBJECT*/ 
+			/************************************/
+			const CRhinoBrepObject* brep_obj = CRhinoBrepObject::Cast( object );
+			if( brep_obj)
+			{
+				brep_obj_count++;
+			}
+		}
+		if( brep_obj_count == 0)
+		{
 			ON_3dPoint center_point( 0.0, 0.0, 0.0 );
 			double radius = 63.5;
 			int __count = plugin.m_dialog->m_comboAltTacco.GetCount();
@@ -473,6 +548,10 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 			ON_Brep* brep = ON_BrepCylinder( cylinder, TRUE, TRUE );
 			if( brep )
 			{
+				/********************/
+				/*TRANSLATE CYLINDER*/
+				/********************/
+				brep->Translate(ON_3dVector( 0.0, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello))) );
 				CRhinoBrepObject* cylinder_object = new CRhinoBrepObject();
 				cylinder_object->SetBrep( brep );
 				if( context.m_doc.AddObject(cylinder_object) )
@@ -484,13 +563,15 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 					delete cylinder_object;
 				}
 			}
+		}/*CLOSED IF OVER CHECKING BREP COUNT OBJECT*/
+		else
+		{
+			RhinoMessageBox(L"THERE IS ALREADY A CYLINDER OBJECT", PlugIn()->PlugInName(), MB_OK | MB_ICONEXCLAMATION );
+		}
+	}
+	/**********************************************************************/
 
-			
 
-	     }
-	  }/*CHIUSURA IF( OBJECT_COUNT > 0 )*/
-  }/*CHIUSURA ELSE*/
 
   return CRhinoCommand::success;
 }
-

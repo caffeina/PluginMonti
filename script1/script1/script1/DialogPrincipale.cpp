@@ -33,6 +33,7 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT2, VAR_Valore_Disassamento);
 	DDV_MinMaxInt(pDX, VAR_Valore_Disassamento, -12, +12);
 	DDX_CBString(pDX, IDC_CMBAltezzaTacco, VAR_Altezza_Tacco);
+	DDX_CBString(pDX, IDC_CMBAltezzaFondello, ValoreAltezzaFondello);
 	DDX_Control(pDX, IDC_CMBAltezzaTacco, m_comboAltTacco);
 	DDX_Radio(pDX, IDC_RADIO1, StatusRadio1_Centrale);
 	DDX_Radio(pDX, IDC_RADIO2, StatusRadio2_Dissasata);
@@ -41,7 +42,6 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO7, StatusRadio7_Fondello_di_ferro);
 	DDX_Radio(pDX, IDC_RADIO8, StatusRadio8_Fondello_di_alluminio);
 	DDX_CBString(pDX, IDC_COMBO1, ValIniezioneDisassamento);
-	DDX_CBString(pDX, IDC_COMBO5, ValoreAltezzaFondello);
 	DDX_Control(pDX, IDC_CHECK1, StatusCheckTaccoSpina);
 }
 
@@ -49,7 +49,7 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_BN_CLICKED(IDCANCEL, &DialogPrincipale::OnBnClickedCancel)	
 	ON_CBN_SELCHANGE(IDC_COMBO1, &DialogPrincipale::OnCbnSelchangeCombo1)
-	ON_CBN_SELCHANGE(IDC_COMBO5, &DialogPrincipale::OnCbnSelchangeCombo5)
+	ON_CBN_SELCHANGE(IDC_CMBAltezzaFondello, &DialogPrincipale::OnCbnSelchangeCmbaltezzafondello)
 	ON_BN_CLICKED(IDC_BUTTON1, &DialogPrincipale::OnBnClickedButton1)
 	ON_CBN_SELCHANGE(IDC_COMBO2, &DialogPrincipale::OnCbnSelchangeCombo2)
 	ON_EN_CHANGE(IDC_EDIT2, &DialogPrincipale::OnEnChangeEdit2)
@@ -64,6 +64,8 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_BN_CLICKED(IDC_RADIO8, &DialogPrincipale::OnBnClickedRadio8)
 	ON_BN_CLICKED(IDC_CHECK1, &DialogPrincipale::OnBnClickedCheck1)
 	ON_EN_CHANGE(IDC_RICHEDIT21, &DialogPrincipale::OnEnChangeRichedit21)
+	ON_BN_CLICKED(IDC_BUTTON2, &DialogPrincipale::OnBnClickedButton2)
+	ON_CBN_SELCHANGE(IDC_CMBAltezzaFondello, &DialogPrincipale::OnCbnSelchangeCmbaltezzafondello)
 END_MESSAGE_MAP()
 
 
@@ -85,6 +87,7 @@ void DialogPrincipale::OnCbnSelchangeCombo1()
 
 void DialogPrincipale::OnCbnSelchangeCombo5()
 {
+	UpdateData(true);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
@@ -221,4 +224,16 @@ void DialogPrincipale::OnEnChangeRichedit21()
 	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
 
 	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+void DialogPrincipale::OnBnClickedButton2()
+{
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+	RhinoApp().RunScript( L"! _GenCylinder", 0 );
+}
+
+void DialogPrincipale::OnCbnSelchangeCmbaltezzafondello()
+{
+	UpdateData(true);
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }

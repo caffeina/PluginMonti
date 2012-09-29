@@ -77,4 +77,6 @@ public:
 public:
 	// variabile controllo check presenza tacco spina
 	CButton StatusCheckTaccoSpina;
+	afx_msg void OnBnClickedButton2();
+	afx_msg void OnCbnSelchangeCmbaltezzafondello();
 };

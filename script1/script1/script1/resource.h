@@ -14,6 +14,7 @@
 #define IDC_COMBO4                      7012
 #define IDC_CMBAltezzaTacco             7012
 #define IDC_COMBO5                      7013
+#define IDC_CMBAltezzaFondello          7013
 #define IDC_BUTTON1                     7014
 #define IDC_EDIT3                       7015
 #define IDC_EDIT4                       7016
@@ -23,6 +24,7 @@
 #define IDC_RADIO2                      7020
 #define IDC_RADIO3                      7021
 #define IDC_RADIO4                      7022
+#define IDC_BUTTON2                     7023
 #define IDC_RADIO7999                   7026
 #define IDC_RADIO7                      7026
 #define IDC_RADIO8                      7027
