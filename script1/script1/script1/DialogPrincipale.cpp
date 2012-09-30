@@ -66,6 +66,7 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_EN_CHANGE(IDC_RICHEDIT21, &DialogPrincipale::OnEnChangeRichedit21)
 	ON_BN_CLICKED(IDC_BUTTON2, &DialogPrincipale::OnBnClickedButton2)
 	ON_CBN_SELCHANGE(IDC_CMBAltezzaFondello, &DialogPrincipale::OnCbnSelchangeCmbaltezzafondello)
+	ON_BN_CLICKED(IDC_BUTTON3, &DialogPrincipale::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -235,5 +236,12 @@ void DialogPrincipale::OnBnClickedButton2()
 void DialogPrincipale::OnCbnSelchangeCmbaltezzafondello()
 {
 	UpdateData(true);
+	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+void DialogPrincipale::OnBnClickedButton3()
+{
+		RhinoApp().RunScript( L"! _TraslaRuota", 0 );
+
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }

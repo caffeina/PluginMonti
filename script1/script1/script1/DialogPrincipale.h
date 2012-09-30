@@ -79,4 +79,6 @@ public:
 	CButton StatusCheckTaccoSpina;
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnCbnSelchangeCmbaltezzafondello();
+public:
+	afx_msg void OnBnClickedButton3();
 };

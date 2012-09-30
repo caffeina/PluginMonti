@@ -575,3 +575,71 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 
   return CRhinoCommand::success;
 }
+
+
+
+/***********************/
+/*BEGIN Traslazione Ruotazione*/
+/***********************/
+class CTraslRuota : public CRhinoTestCommand
+{
+public:
+  // The one and only instance of CCommandscript1 is created below.
+  // No copy constructor or operator= is required.  Values of
+  // member variables persist for the duration of the application.
+
+  // CCommandscript1::CCommandscript1()
+  // is called exactly once when static thescript1Command is created.
+	CTraslRuota() {}
+
+  // CCommandscript1::~CCommandscript1()
+  // is called exactly once when static thescript1Command is
+  // destroyed.  The destructor should not make any calls to
+  // the Rhino SDK.  If your command has persistent settings,
+  // then override CRhinoCommand::SaveProfile and CRhinoCommand::LoadProfile.
+  ~CTraslRuota() {}
+
+  // Returns a unique UUID for this command.
+  // If you try to use an id that is already being used, then
+  // your command will not work.  Use GUIDGEN.EXE to make unique UUID.
+	UUID CommandUUID()
+	{
+	
+		// {9EDB030E-81A5-4e20-A7E6-0DAEB4D077D2}
+
+
+
+	static const GUID CTraslRuotaCommand_UUID = 
+	{ 0x9edb030e, 0x81a5, 0x4e20, { 0xa7, 0xe6, 0xd, 0xae, 0xb4, 0xd0, 0x77, 0xd2 } };
+	return CTraslRuotaCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"TraslaRuota"; }
+	const wchar_t* LocalCommandName() { return L"TraslaRuota"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+static class CTraslRuota theCTraslRuotaCommand;
+CRhinoCommand::result CTraslRuota::RunCommand( const CRhinoCommandContext& context )
+{
+	Cscript1PlugIn& plugin = script1PlugIn();
+	if( !plugin.IsDlgVisible() )
+	{
+		return CRhinoCommand::nothing;
+	}
+
+	/*GET A REFERENCE TO THE LAYER TABLE*/
+  CRhinoLayerTable& layer_table = context.m_doc.m_layer_table;
+  ON_Layer currentLayer;
+	  int numLayers = layer_table.LayerCount();
+	 
+	  for(int i = 0; i < numLayers; i++)
+	  {
+		  
+			  currentLayer = layer_table[i];
+			  currentLayer.SetVisible(true);
+			  layer_table.ModifyLayer(currentLayer, i);
+		  
+	  }
+	  context.m_doc.Redraw();
+}
+
