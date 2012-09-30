@@ -89,4 +89,7 @@ public:
 	afx_msg void OnEnChangeEdit5();
 public:
 	CString ValoreRotazione;
+public:
+	// con questo dovrebbe funzionare
+	CComboBox AltezzaFondelloControllo;
 };

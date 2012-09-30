@@ -580,7 +580,13 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				/********************/
 				/*TRANSLATE CYLINDER*/
 				/********************/
-				brep->Translate(ON_3dVector( 0.0, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello))));
+				int nIndex1 = plugin.m_dialog->AltezzaFondelloControllo.GetCurSel();
+				CString strCBText1;
+				plugin.m_dialog->AltezzaFondelloControllo.GetLBText( nIndex1, strCBText1);
+				int altfondello = _wtoi(strCBText1);
+				
+				
+				brep->Translate(ON_3dVector( 0.0, 0.0, -altfondello));
 				CRhinoBrepObject* cylinder_object = new CRhinoBrepObject();
 				cylinder_object->SetBrep( brep );
 				if( context.m_doc.AddObject(cylinder_object) )

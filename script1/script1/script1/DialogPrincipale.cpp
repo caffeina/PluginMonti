@@ -47,6 +47,7 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK1, StatusCheckTaccoSpina);
 	DDX_Text(pDX, IDC_EDIT4, ValoreTraslazione);
 	DDX_Text(pDX, IDC_EDIT5, ValoreRotazione);
+	DDX_Control(pDX, IDC_CMBAltezzaFondello, AltezzaFondelloControllo);
 }
 
 
