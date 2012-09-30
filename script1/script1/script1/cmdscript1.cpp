@@ -424,30 +424,59 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
       obj->Select( true );
   }
 //aniello end
-		
-
 			//end code temp
-            /*********************/
+
+  			/*********************/
 			/*JOIN LINES TOGETHER*/
-			CRhinoGetObject go;
-			go.SetCommandPrompt( L"SELECT OBJECTS TO GROUP" );
-			go.EnableGroupSelect();
-			go.GetObjects(1,0);
-			if( go.CommandResult() != CRhinoCommand::success )
+			/*********************/
+			ON_SimpleArray<const ON_Curve*> lines;
+			ON_SimpleArray<CRhinoObject*> objectsLine;
+			ON_SimpleArray<ON_Curve*> output;
+			double tolerance = context.m_doc.AbsoluteTolerance();
+			int LinesCount = context.m_doc.LookupObject( layer, objectsLine);
+
+			if( LinesCount > 0 )
 			{
-				return go.CommandResult();
+				for(int i = 0; i < LinesCount; i++)
+				{
+					const CRhinoCurveObject* curve_obj = CRhinoCurveObject::Cast( objectsLine[i] );
+					if( curve_obj )
+					{
+						lines.Append(curve_obj->Curve());
+					}
+				}
 			}
-			 
-			int i = 0, count = go.ObjectCount();
-			ON_SimpleArray<const CRhinoObject*> members( count );
-			 
-			for( i = 0; i < count; i++ )
+		    if( RhinoMergeCurves(lines, output, tolerance) )
+		    {
+				for(int i = 0; i < output.Count(); i++ )
+				{
+					CRhinoCurveObject* crv = new CRhinoCurveObject;
+					crv->SetCurve( output[i] );
+					if( context.m_doc.AddObject(crv) )
+					{
+						crv->Select();
+					}
+					else
+					{
+						delete crv;
+					}
+				}
+		    }
+			/************************/
+			/*DELETE CHILDREN CURVES*/
+			/************************/
+			for(int i = 0; i < LinesCount; i++ )
 			{
-				members.Append( go.Object(i).Object() );
+				context.m_doc.DeleteObject(objectsLine[i]);
 			}
-			 
-			int index = context.m_doc.m_group_table.AddGroup( ON_Group(), members );
-			context.m_doc.Redraw();			
+			context.m_doc.Redraw();
+
+			/*************************/
+			/*END JOIN LINES TOGETHER*/
+			/*************************/
+
+
+
 
 	     }
 	  }/*CHIUSURA IF( OBJECT_COUNT > 0 )*/
@@ -551,7 +580,7 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				/********************/
 				/*TRANSLATE CYLINDER*/
 				/********************/
-				brep->Translate(ON_3dVector( 0.0, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello))) );
+				brep->Translate(ON_3dVector( 0.0, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello))));
 				CRhinoBrepObject* cylinder_object = new CRhinoBrepObject();
 				cylinder_object->SetBrep( brep );
 				if( context.m_doc.AddObject(cylinder_object) )
