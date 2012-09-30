@@ -658,17 +658,46 @@ CRhinoCommand::result CTraslRuota::RunCommand( const CRhinoCommandContext& conte
 
 	/*GET A REFERENCE TO THE LAYER TABLE*/
   CRhinoLayerTable& layer_table = context.m_doc.m_layer_table;
+  
+
+
   ON_Layer currentLayer;
 	  int numLayers = layer_table.LayerCount();
 	 
 	  for(int i = 0; i < numLayers; i++)
-	  {
+{
 		  
 			  currentLayer = layer_table[i];
+			  const CRhinoLayer& layer = layer_table[i];
+
 			  currentLayer.SetVisible(true);
+			  
 			  layer_table.ModifyLayer(currentLayer, i);
+			  layer_table.SetCurrentLayerIndex(i);
+			  
 		  
+	  
+	  
+	  
+	  
+	  const CRhinoLayer& current_layer = layer_table.CurrentLayer();
+
+	  int layer_index = layer_table.CurrentLayerIndex();
+	  const CRhinoLayer& layer2 = layer_table[layer_index];
+
+	  ON_SimpleArray<CRhinoObject*> obj_list;
+	  int j, obj_count = context.m_doc.LookupObject( layer2, obj_list );
+	  for( j = 0; j < obj_count; j++ )
+	  {
+			  CRhinoObject* obj = obj_list[j];
+			  if( obj && obj->IsSelectable() )
+				  obj->Select();
+			  if( obj_count )
+				context.m_doc.Redraw();
 	  }
+	  
+}  
+
 	  context.m_doc.Redraw();
 }
 
