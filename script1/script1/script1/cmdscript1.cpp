@@ -718,7 +718,30 @@ CRhinoCommand::result CTraslRuota::RunCommand( const CRhinoCommandContext& conte
 
 			ON_Xform xform;
     xform.Rotation( m_angle * ON_PI / 180.0, plane.zaxis, plane.Origin() );
+	//context.m_doc.TransformObject( obj, xform, true, true, true );
+	context.m_doc.Redraw();
+	xform.Translation( 25,0,0);
 	context.m_doc.TransformObject( obj, xform, true, true, true );
+	context.m_doc.Redraw();
+		}
+
+		CRhinoGetObject go1;
+		  go1.GetObjects( 1, 0 );
+		  int numero1 = go1.ObjectCount();
+		for( int k = 0; k < go1.ObjectCount(); k++ )
+		{
+		 // Get an object reference
+			const CRhinoObjRef& ref = go1.Object(k);
+ 
+			// Get the real object
+			const CRhinoObject* obj = ref.Object();
+			if( !obj )
+			continue;
+
+			ON_Xform xform;
+    xform.Rotation( m_angle * ON_PI / 180.0, plane.zaxis, plane.Origin() );
+	context.m_doc.TransformObject( obj, xform, true, true, true );
+	context.m_doc.Redraw();
 		}
 		 context.m_doc.Redraw();
 
