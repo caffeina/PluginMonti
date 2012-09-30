@@ -650,54 +650,83 @@ public:
 static class CTraslRuota theCTraslRuotaCommand;
 CRhinoCommand::result CTraslRuota::RunCommand( const CRhinoCommandContext& context )
 {
-	Cscript1PlugIn& plugin = script1PlugIn();
-	if( !plugin.IsDlgVisible() )
+		Cscript1PlugIn& plugin = script1PlugIn();
+		if( !plugin.IsDlgVisible() )
+		{
+			return CRhinoCommand::nothing;
+		}
+
+		/*GET A REFERENCE TO THE LAYER TABLE*/
+	  CRhinoLayerTable& layer_table = context.m_doc.m_layer_table;
+	  
+
+
+	  ON_Layer currentLayer;
+		  int numLayers = layer_table.LayerCount();
+		 
+		  for(int i = 0; i < numLayers; i++)
 	{
-		return CRhinoCommand::nothing;
-	}
-
-	/*GET A REFERENCE TO THE LAYER TABLE*/
-  CRhinoLayerTable& layer_table = context.m_doc.m_layer_table;
-  
-
-
-  ON_Layer currentLayer;
-	  int numLayers = layer_table.LayerCount();
-	 
-	  for(int i = 0; i < numLayers; i++)
-{
-		  
-			  currentLayer = layer_table[i];
-			  const CRhinoLayer& layer = layer_table[i];
-
-			  currentLayer.SetVisible(true);
 			  
-			  layer_table.ModifyLayer(currentLayer, i);
-			  layer_table.SetCurrentLayerIndex(i);
+				  currentLayer = layer_table[i];
+				  const CRhinoLayer& layer = layer_table[i];
+
+				  currentLayer.SetVisible(true);
+				  
+				  layer_table.ModifyLayer(currentLayer, i);
+				  layer_table.SetCurrentLayerIndex(i);
+				  
 			  
 		  
-	  
-	  
-	  
-	  
-	  const CRhinoLayer& current_layer = layer_table.CurrentLayer();
+		  
+		  
+		  
+		  const CRhinoLayer& current_layer = layer_table.CurrentLayer();
 
-	  int layer_index = layer_table.CurrentLayerIndex();
-	  const CRhinoLayer& layer2 = layer_table[layer_index];
+		  int layer_index = layer_table.CurrentLayerIndex();
+		  const CRhinoLayer& layer2 = layer_table[layer_index];
 
-	  ON_SimpleArray<CRhinoObject*> obj_list;
-	  int j, obj_count = context.m_doc.LookupObject( layer2, obj_list );
-	  for( j = 0; j < obj_count; j++ )
-	  {
-			  CRhinoObject* obj = obj_list[j];
-			  if( obj && obj->IsSelectable() )
-				  obj->Select();
-			  if( obj_count )
-				context.m_doc.Redraw();
-	  }
-	  
-}  
+		  ON_SimpleArray<CRhinoObject*> obj_list;
+		  int j, obj_count = context.m_doc.LookupObject( layer2, obj_list );
+		  for( j = 0; j < obj_count; j++ )
+		  {
+				  CRhinoObject* obj = obj_list[j];
+				  if( obj && obj->IsSelectable() )
+					  obj->Select();
+				  if( obj_count )
+					context.m_doc.Redraw();
+		  }
+		  
+	}  
 
-	  context.m_doc.Redraw();
+		  context.m_doc.Redraw();
+
+		  CRhinoGetObject go;
+		  go.GetObjects( 1, 0 );
+		  int numero = go.ObjectCount();
+		  double m_angle=20;
+		  ON_Plane plane = RhinoActiveCPlane();
+		  int i;
+		for( i = 0; i < go.ObjectCount(); i++ )
+		{
+		 // Get an object reference
+			const CRhinoObjRef& ref = go.Object(i);
+ 
+			// Get the real object
+			const CRhinoObject* obj = ref.Object();
+			if( !obj )
+			continue;
+
+			ON_Xform xform;
+    xform.Rotation( m_angle * ON_PI / 180.0, plane.zaxis, plane.Origin() );
+	context.m_doc.TransformObject( obj, xform, true, true, true );
+		}
+		 context.m_doc.Redraw();
+
+
+
+
+
+
+
 }
 
