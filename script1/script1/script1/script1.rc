@@ -82,10 +82,8 @@ BEGIN
     PUSHBUTTON      "Genera Piano Visionale",IDC_BUTTON1,291,43,82,14
     GROUPBOX        "",IDC_STATIC,7,92,220,207
     GROUPBOX        "Rotazione Traslazione Tacco",IDC_STATIC,243,155,130,144,BS_CENTER
-    EDITTEXT        IDC_EDIT4,315,180,40,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT5,315,213,40,14,ES_AUTOHSCROLL
-    CTEXT           "Traslazione sull'asse X",IDC_STATIC,263,177,37,31
-    CTEXT           "Rotazione rispetto punto (0,0,0)",IDC_STATIC,264,206,42,35
+    CTEXT           "Traslazione sull'asse X",IDC_STATIC,265,212,37,31
+    CTEXT           "Rotazione rispetto punto base",IDC_STATIC,265,168,42,35
     CONTROL         "Tacco con Spina",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,110,67,10
     CONTROL         "Centrale",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,108,103,43,10
     CONTROL         "Disassata",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,108,118,47,10
@@ -100,6 +98,8 @@ BEGIN
     PUSHBUTTON      "Genera Cilindro",IDC_BUTTON2,291,61,82,14
     PUSHBUTTON      "Trasla Ruota",IDC_BUTTON3,286,252,50,14
     PUSHBUTTON      "Annulla",IDC_BUTTON4,286,274,50,14
+    EDITTEXT        IDC_EDIT5,314,177,40,14,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_EDIT4,313,215,40,14,ES_AUTOHSCROLL
 END
 
 

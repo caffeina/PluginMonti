@@ -700,31 +700,11 @@ CRhinoCommand::result CTraslRuota::RunCommand( const CRhinoCommandContext& conte
 
 		  context.m_doc.Redraw();
 
-		  CRhinoGetObject go;
-		  go.GetObjects( 1, 0 );
-		  int numero = go.ObjectCount();
-		  double m_angle=20;
+			//inizio rotazione
+		  
+		  double m_angle=(_wtof(plugin.m_dialog->ValoreRotazione));
 		  ON_Plane plane = RhinoActiveCPlane();
-		  int i;
-		for( i = 0; i < go.ObjectCount(); i++ )
-		{
-		 // Get an object reference
-			const CRhinoObjRef& ref = go.Object(i);
- 
-			// Get the real object
-			const CRhinoObject* obj = ref.Object();
-			if( !obj )
-			continue;
-
-			ON_Xform xform;
-    xform.Rotation( m_angle * ON_PI / 180.0, plane.zaxis, plane.Origin() );
-	//context.m_doc.TransformObject( obj, xform, true, true, true );
-	context.m_doc.Redraw();
-	xform.Translation( 25,0,0);
-	context.m_doc.TransformObject( obj, xform, true, true, true );
-	context.m_doc.Redraw();
-		}
-
+		  
 		CRhinoGetObject go1;
 		  go1.GetObjects( 1, 0 );
 		  int numero1 = go1.ObjectCount();
@@ -743,6 +723,36 @@ CRhinoCommand::result CTraslRuota::RunCommand( const CRhinoCommandContext& conte
 	context.m_doc.TransformObject( obj, xform, true, true, true );
 	context.m_doc.Redraw();
 		}
+
+		//fine rotazione
+
+
+			//inizio traslazione		 
+		  CRhinoGetObject go;
+		  int numero = go.ObjectCount();
+		  go.GetObjects( 1, 0 );
+		  
+		for( int i = 0; i < go.ObjectCount(); i++ )
+		{
+		 // Get an object reference
+			const CRhinoObjRef& ref = go.Object(i);
+ 
+			// Get the real object
+			const CRhinoObject* obj = ref.Object();
+			if( !obj )
+			continue;
+
+			ON_Xform xform;
+    xform.Rotation( m_angle * ON_PI / 180.0, plane.zaxis, plane.Origin() );
+	//context.m_doc.TransformObject( obj, xform, true, true, true );
+	context.m_doc.Redraw();
+	xform.Translation((_wtof(plugin.m_dialog->ValoreTraslazione)),0,0);
+	context.m_doc.TransformObject( obj, xform, true, true, true );
+	context.m_doc.Redraw();
+		}
+			// fine traslazione
+
+		
 		 context.m_doc.Redraw();
 
 
