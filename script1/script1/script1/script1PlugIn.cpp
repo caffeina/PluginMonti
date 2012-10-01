@@ -38,7 +38,7 @@ RHINO_PLUG_IN_VERSION( __DATE__"  "__TIME__ )
 // When completed, delete the following #error directive.
 //#error Developer declarations block is incomplete!
 RHINO_PLUG_IN_DEVELOPER_ORGANIZATION( L"OutOfFire" );
-RHINO_PLUG_IN_DEVELOPER_ADDRESS( L"vico castellina napoli" );
+RHINO_PLUG_IN_DEVELOPER_ADDRESS( L"vuoto" );
 RHINO_PLUG_IN_DEVELOPER_COUNTRY( L"italia" );
 RHINO_PLUG_IN_DEVELOPER_PHONE( L"+3396766505" );
 RHINO_PLUG_IN_DEVELOPER_FAX( L"vuoto" );
