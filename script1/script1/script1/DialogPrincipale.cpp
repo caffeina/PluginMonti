@@ -19,8 +19,6 @@ DialogPrincipale::DialogPrincipale(CWnd* pParent)
 	, StatusRadio7_Fondello_di_ferro(0)
 	, ValIniezioneDisassamento(_T("+12"))
 	, ValoreAltezzaFondello(_T("20"))
-	, ValoreTraslazione(_T(""))
-	, ValoreRotazione(_T(""))
 {
 }
 
@@ -45,9 +43,6 @@ void DialogPrincipale::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO8, StatusRadio8_Fondello_di_alluminio);
 	DDX_CBString(pDX, IDC_COMBO1, ValIniezioneDisassamento);
 	DDX_Control(pDX, IDC_CHECK1, StatusCheckTaccoSpina);
-	DDX_Text(pDX, IDC_EDIT4, ValoreTraslazione);
-	DDX_Text(pDX, IDC_EDIT5, ValoreRotazione);
-	DDX_Control(pDX, IDC_CMBAltezzaFondello, AltezzaFondelloControllo);
 }
 
 
@@ -72,8 +67,6 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON2, &DialogPrincipale::OnBnClickedButton2)
 	ON_CBN_SELCHANGE(IDC_CMBAltezzaFondello, &DialogPrincipale::OnCbnSelchangeCmbaltezzafondello)
 	ON_BN_CLICKED(IDC_BUTTON3, &DialogPrincipale::OnBnClickedButton3)
-	ON_EN_CHANGE(IDC_EDIT4, &DialogPrincipale::OnEnChangeEdit4)
-	ON_EN_CHANGE(IDC_EDIT5, &DialogPrincipale::OnEnChangeEdit5)
 END_MESSAGE_MAP()
 
 
@@ -170,7 +163,6 @@ void DialogPrincipale::OnBnClickedRadio1()
 void DialogPrincipale::OnBnClickedRadio7()
 {
 	UpdateData (TRUE);
-	GetDlgItem(IDC_EDIT5)->EnableWindow(FALSE);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
@@ -195,7 +187,6 @@ void DialogPrincipale::OnBnClickedRadio4()
 void DialogPrincipale::OnBnClickedRadio8()
 {
 	UpdateData (TRUE);
-	GetDlgItem(IDC_EDIT5)->EnableWindow(TRUE);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
@@ -253,26 +244,4 @@ void DialogPrincipale::OnBnClickedButton3()
 		RhinoApp().RunScript( L"! _TraslaRuota", 0 );
 
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
-}
-
-void DialogPrincipale::OnEnChangeEdit4()
-{
-	UpdateData(true);
-	// TODO:  Se si tratta di un controllo RICHEDIT, il controllo non
-	// invierà questa notifica a meno che non si esegua l'override della funzione CRhinoDialog::OnInitDialog()
-	// e venga eseguita la chiamata a CRichEditCtrl().SetEventMask()
-	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
-
-	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
-}
-
-void DialogPrincipale::OnEnChangeEdit5()
-{
-	UpdateData(true);
-	// TODO:  Se si tratta di un controllo RICHEDIT, il controllo non
-	// invierà questa notifica a meno che non si esegua l'override della funzione CRhinoDialog::OnInitDialog()
-	// e venga eseguita la chiamata a CRichEditCtrl().SetEventMask()
-	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
-
-	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
 }
