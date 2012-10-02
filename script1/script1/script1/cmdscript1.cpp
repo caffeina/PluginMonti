@@ -291,19 +291,16 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 			ON_3dPoint point0((pointStart.x - posLen*cos(betaAngle*acos(-1.0)/180.0)), 0.0, (pointStart.z + posLen*sin(betaAngle*acos(-1.0)/180.0)));
 			ON_3dPoint point1((pointEnd.x + antLen*cos(alphaAngle*acos(-1.0)/180.0)), 0.0, (pointEnd.z - antLen*sin(alphaAngle*acos(-1.0)/180.0)));
 
-
-			//double len = sqrt((pointStart.x - pointEnd.x)*(pointStart.x - pointEnd.x) + 
-			//	              (pointStart.y - pointEnd.y)*(pointStart.y - pointEnd.y) + 
-			//				  (pointStart.z - pointEnd.z)*(pointStart.z - pointEnd.z));
-
-
+			/**********************************/
 			/*CREATE THE LINE CURVES TO FILLET*/ 
+			/**********************************/
 			ON_LineCurve curve0( pointStart, point0 ); //LINEA A SINISTRA IN FRONT VIEW
 			ON_LineCurve curve1( point1, pointEnd );   //LINEA A DESTRA IN FRONT VIEW 
 
 			
-			
+			/***************************************************/
 			/*FILLET AT THE END/START POINTS OF THE LINE CURVES*/ 
+			/***************************************************/
 			double curve0_t = crv0->Domain().Max();
 			double curve1_t = curve1.Domain().Min();
 			
@@ -311,14 +308,18 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 			
 			if( RhinoGetFilletPoints(curve1,  *crv0, antRad, curve1_t, curve0_t, t1, t0, plane) )
 			{
+				/*******************************/
 				/*TRIM BACK THE TWO LINE CURVES*/ 
+				/*******************************/
 				ON_Interval domain1( curve1.Domain().Min(), t1 );
 				curve1.Trim( domain1 );
 		 
 				ON_Interval domain0( crv0->Domain().Min(), t0 );
 				crv0->Trim( domain0 );
-		 
+
+		        /**************************/
 				/*COMPUTE THE FILLET CURVE*/ 
+				/**************************/
 				ON_3dVector radial0 = curve1.PointAt(t1) - plane.Origin();
 				radial0.Unitize();
 		 
@@ -329,7 +330,9 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 				ON_Plane fillet_plane( plane.Origin(), radial0, radial1 );
 				ON_Arc fillet( fillet_plane, plane.Origin(), antRad, angle );
 		 
-				//ADD THE GEOMETRY
+				/******************/
+				/*ADD THE GEOMETRY*/
+				/******************/
 				context.m_doc.AddCurveObject( curve1 );
 				context.m_doc.ReplaceObject(objref, *crv0 );
 				context.m_doc.AddCurveObject( fillet );
@@ -474,10 +477,6 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 			/*************************/
 			/*END JOIN LINES TOGETHER*/
 			/*************************/
-
-
-
-
 	     }
 	  }/*CHIUSURA IF( OBJECT_COUNT > 0 )*/
   }/*CHIUSURA ELSE*/
@@ -547,11 +546,26 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 			/************************************/
 			/*TRY CASTING AS A RHINO BREP OBJECT*/ 
 			/************************************/
+			//const ON_PolyCurve* polycurve = CRhinoPolyEdge::Cast(object);
+			//if(polycurve)
+			//{
+			//	if(!object->IsSolid())
+			//	{
+			//		brep_obj_count++;
+			//	}
+			//}
 			const CRhinoBrepObject* brep_obj = CRhinoBrepObject::Cast( object );
-			if( brep_obj)
+			if( brep_obj && !object->IsSolid())
 			{
 				brep_obj_count++;
 			}
+			//const ON_Geometry* geo = object->Geometry();
+			//if( geo)
+			//{
+			//	const ON_Cylinder *cylinder = 
+			//	brep_obj_count++;
+			//}
+
 		}
 		if( brep_obj_count == 0)
 		{
@@ -597,6 +611,89 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				{
 					delete cylinder_object;
 				}
+
+				/*********************************************/
+				/*               DA SISTEMARE                */
+				/*********************************************/
+				CRhinoSnapContext snap;
+				bool dec1 = snap.SnapToPoint(ON_3dPoint(63.5, 0.0, (height - (_wtof(plugin.m_dialog->ValoreAltezzaFondello)))));
+				bool dec2 = snap.SnapToPoint(ON_3dPoint(63.5, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello))));
+				bool dec3 = snap.SnapToPoint(ON_3dPoint(63.5, 0.0, 0.0));
+				if(dec1 && dec2)
+				{
+					CRhinoLinearDimension* dim_obj = new CRhinoLinearDimension();
+					ON_Plane plane( ON_zx_plane );
+					plane.SetOrigin( ON_3dPoint(63.5, 0.0, 0.0) );
+					dim_obj->SetPlane( plane );
+					ON_3dPoint pt_1(63.5, 0.0, (height - (_wtof(plugin.m_dialog->ValoreAltezzaFondello))));
+					ON_3dPoint pt_2(63.5, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello)));
+
+					double u, v;
+					plane.ClosestPointTo( pt_1, &u, &v );
+					dim_obj->SetPoint( 0, ON_2dPoint(u, v) );
+					dim_obj->SetPoint( 1, ON_2dPoint(u, (v + height/2)) );
+
+
+					plane.ClosestPointTo( pt_2, &u, &v );
+					dim_obj->SetPoint( 2, ON_2dPoint(u, v) );
+					dim_obj->SetPoint( 3, ON_2dPoint(u, (v + height/2)) );
+
+					dim_obj->UpdateText();
+					 
+					if( context.m_doc.AddObject(dim_obj) )
+					{
+						context.m_doc.Redraw();
+					}		
+					else
+					{
+						delete dim_obj;
+					}
+				}
+				/*********************************************/
+				/*               DA SISTEMARE                */
+				/*********************************************/
+				if(dec2 && dec3)
+				{
+					CRhinoLinearDimension* dim_obj = new CRhinoLinearDimension();
+					ON_Plane plane( ON_zx_plane );
+					plane.SetOrigin( ON_3dPoint(63.5, 0.0, 0.0) );
+					dim_obj->SetPlane( plane );
+					ON_3dPoint pt_1(63.5, 0.0, 0.0);
+					ON_3dPoint pt_2(63.5, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello)));
+
+					double u, v;
+					plane.ClosestPointTo( pt_1, &u, &v );
+					dim_obj->SetPoint( 0, ON_2dPoint(u, v) );
+					dim_obj->SetPoint( 1, ON_2dPoint(u, (v + height/2)) );
+
+
+					plane.ClosestPointTo( pt_2, &u, &v );
+					dim_obj->SetPoint( 2, ON_2dPoint(u, v) );
+					dim_obj->SetPoint( 3, ON_2dPoint(u, (v + height/2)) );
+
+					dim_obj->UpdateText();
+					 
+					if( context.m_doc.AddObject(dim_obj) )
+					{
+						context.m_doc.Redraw();
+					}		
+					else
+					{
+						delete dim_obj;
+					}
+				}
+
+				/*********************************************/
+				/*           CREATE FONDELLO PLANE           */
+				/*********************************************/
+				ON_3dPoint point0((63.5 + 20.0),0.0, 0.0);
+				ON_3dPoint point1(-(63.5 + 20.0),0.0, 0.0);
+				ON_LineCurve curve0( point0, point1 );
+				context.m_doc.AddCurveObject(curve0);
+				context.m_doc.Redraw();
+
+
+
 			}
 		}/*CLOSED IF OVER CHECKING BREP COUNT OBJECT*/
 		else
