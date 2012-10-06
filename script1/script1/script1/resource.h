@@ -16,7 +16,7 @@
 #define IDC_COMBO5                      7013
 #define IDC_CMBAltezzaFondello          7013
 #define IDC_BUTTON1                     7014
-#define IDC_EDIT3                       7015
+
 #define IDC_EDIT4                       7016
 #define IDC_EDIT5                       7017
 #define IDC_EDIT6                       7018

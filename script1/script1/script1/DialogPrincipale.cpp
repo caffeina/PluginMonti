@@ -59,7 +59,7 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO2, &DialogPrincipale::OnCbnSelchangeCombo2)
 	ON_EN_CHANGE(IDC_EDIT2, &DialogPrincipale::OnEnChangeEdit2)
 	ON_BN_CLICKED(IDOK, &DialogPrincipale::OnBnClickedOk)
-	ON_EN_CHANGE(IDC_EDIT3, &DialogPrincipale::OnEnChangeEdit3)
+	
 	ON_CBN_SELCHANGE(IDC_CMBAltezzaTacco, &DialogPrincipale::OnCbnSelchangeCmbaltezzatacco)
 	ON_BN_CLICKED(IDC_RADIO3, &DialogPrincipale::OnBnClickedRadio3)
 	ON_BN_CLICKED(IDC_RADIO1, &DialogPrincipale::OnBnClickedRadio1)
@@ -152,7 +152,7 @@ void DialogPrincipale::OnCbnSelchangeCmbaltezzatacco()
 void DialogPrincipale::OnBnClickedRadio3()
 {
 	UpdateData (TRUE);
-	GetDlgItem(IDC_EDIT3)->EnableWindow(FALSE);
+	
 	
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
@@ -163,6 +163,10 @@ void DialogPrincipale::OnBnClickedRadio1()
 	GetDlgItem(IDC_EDIT2)->EnableWindow(FALSE);
 	StatusRadio7_Fondello_di_ferro = 0;
 	StatusRadio8_Fondello_di_alluminio = -1;
+	StatusRadio4_Iniezione_Disassata = 0;
+	StatusRadio3_Iniezione_Centrale = -1;
+	GetDlgItem(IDC_RADIO3)->EnableWindow(FALSE);
+
 	UpdateData (FALSE);
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
@@ -180,6 +184,9 @@ void DialogPrincipale::OnBnClickedRadio2()
 	GetDlgItem(IDC_EDIT2)->EnableWindow(TRUE);
 	StatusRadio8_Fondello_di_alluminio = 0;
 	StatusRadio7_Fondello_di_ferro = -1;
+	StatusRadio4_Iniezione_Disassata = -1;
+	StatusRadio3_Iniezione_Centrale = 0;
+	GetDlgItem(IDC_RADIO3)->EnableWindow(TRUE);
 	UpdateData (FALSE);
 
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
@@ -188,7 +195,7 @@ void DialogPrincipale::OnBnClickedRadio2()
 void DialogPrincipale::OnBnClickedRadio4()
 {
 	UpdateData (TRUE);
-	GetDlgItem(IDC_EDIT3)->EnableWindow(TRUE);
+	
 	// TODO: aggiungere qui il codice per la gestione della notifica del controllo.
 }
 
@@ -209,6 +216,11 @@ void DialogPrincipale::OnBnClickedCheck1()
 	GetDlgItem(IDC_RADIO7)->EnableWindow(TRUE);
 	GetDlgItem(IDC_RADIO8)->EnableWindow(TRUE);
 	GetDlgItem(IDC_COMBO1)->EnableWindow(TRUE);
+	//GetDlgItem(IDC_RADIO2)->GetCheckedRadioButton(IDC_RADIO2,IDC_RADIO2);
+	StatusRadio2_Dissasata = 0;
+	StatusRadio1_Centrale = -1;
+	//CheckRadioButton(IDC_RADIO2,IDC_RADIO2,IDC_RADIO2);
+	UpdateData(FALSE);
 	}
 	else {
 	GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
