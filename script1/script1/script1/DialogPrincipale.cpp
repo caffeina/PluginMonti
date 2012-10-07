@@ -74,6 +74,7 @@ BEGIN_MESSAGE_MAP(DialogPrincipale, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON3, &DialogPrincipale::OnBnClickedButton3)
 	ON_EN_CHANGE(IDC_EDIT4, &DialogPrincipale::OnEnChangeEdit4)
 	ON_EN_CHANGE(IDC_EDIT5, &DialogPrincipale::OnEnChangeEdit5)
+	ON_BN_CLICKED(IDC_BUTTON5, &DialogPrincipale::OnBnClickedButton5)
 END_MESSAGE_MAP()
 
 
@@ -287,4 +288,20 @@ void DialogPrincipale::OnEnChangeEdit5()
 	// con il flag ENM_CHANGE introdotto dall'operatore OR nella maschera.
 
 	// TODO:  Aggiungere qui il codice per la gestione della notifica del controllo.
+}
+
+void DialogPrincipale::OnBnClickedButton5()
+{
+	//RhinoApp().RunScript( L"! _TCone", 0 );
+	RhinoApp().RunScript( L"! _GenUgello", 0 );
+	//RhinoApp().EnterCommand
+	//RhinoApp().ExecuteCommand
+	//RhinoApp().
+	//RhinoApp().RunMenuScript( L"! d");
+	//RhinoApp().RunScript( L"! _d", 0 );
+	//RhinoApp().RunScript( L"! _6,5", 0 );
+	//RhinoApp().Print( L"LAYER \ DOES NOT EXIST.\n" );
+
+
+
 }

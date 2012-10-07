@@ -861,8 +861,182 @@ CRhinoCommand::result CTraslRuota::RunCommand( const CRhinoCommandContext& conte
 
 
 
-
+return CRhinoCommand::success;
 
 
 }
+
+
+
+
+/***********************/
+/*BEGIN Genera Ugello*/
+/***********************/
+class CGenUgello : public CRhinoTestCommand
+{
+public:
+  // The one and only instance of CCommandscript1 is created below.
+  // No copy constructor or operator= is required.  Values of
+  // member variables persist for the duration of the application.
+
+  // CCommandscript1::CCommandscript1()
+  // is called exactly once when static thescript1Command is created.
+	CGenUgello() {}
+
+  // CCommandscript1::~CCommandscript1()
+  // is called exactly once when static thescript1Command is
+  // destroyed.  The destructor should not make any calls to
+  // the Rhino SDK.  If your command has persistent settings,
+  // then override CRhinoCommand::SaveProfile and CRhinoCommand::LoadProfile.
+  ~CGenUgello() {}
+
+  // Returns a unique UUID for this command.
+  // If you try to use an id that is already being used, then
+  // your command will not work.  Use GUIDGEN.EXE to make unique UUID.
+	UUID CommandUUID()
+	{
+	// {732BF1E5-41D8-41b0-83EF-30BCC117DF1C}
+
+	
+	static const GUID CGenUgelloCommand_UUID = 
+	{ 0x732bf1e5, 0x41d8, 0x41b0, { 0x83, 0xef, 0x30, 0xbc, 0xc1, 0x17, 0xdf, 0x1c } };
+	return CGenUgelloCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"GenUgello"; }
+	const wchar_t* LocalCommandName() { return L"GenUgello"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
+
+static class CGenUgello theCGenUgelloCommand;
+CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& context )
+{
+		Cscript1PlugIn& plugin = script1PlugIn();
+		if( !plugin.IsDlgVisible() )
+		{
+			return CRhinoCommand::nothing;
+		}
+
+		/*GET A REFERENCE TO THE LAYER TABLE*/
+	  CRhinoLayerTable& layer_table = context.m_doc.m_layer_table;
+	
+	  ON_3dPoint bottom_pt( -12.0,0, 91.0 );
+	  double bottom_radius = 3.25;
+	  ON_Circle bottom_circle( bottom_pt, bottom_radius );
+
+	   ON_3dPoint top_pt( -12.0,0 , 101.0);
+	   double top_radius = 11;
+	   ON_Circle top_circle( top_pt, top_radius );
+
+
+	   ON_RevSurface* revsrf = new ON_RevSurface;
+  ON_LineCurve* pShapeCurve = new ON_LineCurve;
+  revsrf->m_curve = pShapeCurve;
+  pShapeCurve->m_dim = 3;
+  pShapeCurve->m_line.from = bottom_circle.PointAt(0);
+  pShapeCurve->m_line.to = top_circle.PointAt(0);
+  pShapeCurve->m_t.Set(0, pShapeCurve->m_line.from.DistanceTo(pShapeCurve->m_line.to));
+  revsrf->m_axis.from = bottom_circle.Center();
+  revsrf->m_axis.to = top_circle.Center();
+  revsrf->m_angle[0] = revsrf->m_t[0] = 0.0;
+  revsrf->m_angle[1] = revsrf->m_t[1] = 2.0*ON_PI;
+ 
+  ON_Brep* tcone_brep = ON_BrepRevSurface(revsrf, TRUE, TRUE );
+  if( tcone_brep )
+  {
+    CRhinoBrepObject* tcone_object = new CRhinoBrepObject();
+    tcone_object->SetBrep( tcone_brep );
+    if( context.m_doc.AddObject(tcone_object) )
+      context.m_doc.Redraw();
+    else
+      delete tcone_object;
+  }
+
+
+//////
+
+   CRhinoGetObject go;
+  go.SetCommandPrompt( L"Select edge of surface to extend" );
+  go.SetGeometryFilter(CRhinoGetObject::edge_object);
+  go.SetGeometryAttributeFilter( CRhinoGetObject::edge_curve );
+  go.GetObjects( 1, 1 );
+  if( go.CommandResult() != CRhinoCommand::success )
+    return go.CommandResult();
+ 
+  const CRhinoObjRef& objref = go.Object(0);
+  const ON_Surface* srf = objref.Surface();
+  if( !srf )
+  {
+    RhinoApp().Print( L"Unable to extend polysurfaces.\n" );
+    return CRhinoCommand::nothing;    
+  }
+ 
+  const ON_Brep* brep = objref.Brep();
+  const ON_BrepFace* face = objref.Face();
+  if( !brep | !face | face->m_face_index < 0 )
+    return CRhinoCommand::failure;
+ 
+  if( !brep->IsSurface() )
+  {
+    RhinoApp().Print( L"Unable to extend trimmed surfaces.\n" );
+    return CRhinoCommand::nothing;    
+  }
+ 
+  const ON_BrepTrim* trim = objref.Trim();
+  if( !trim )
+    return CRhinoCommand::failure;
+ 
+  ON_Surface::ISO edge_index( trim->m_iso );
+  int dir = edge_index % 2;
+  if( srf->IsClosed(1-dir) )
+  {
+    RhinoApp().Print(L"Unable to extend surface at seam.\n" );
+    return CRhinoCommand::nothing;  
+  }
+  if( edge_index < ON_Surface::W_iso | edge_index > ON_Surface::N_iso )
+  {
+    RhinoApp().Print( L"Selected edge must be an underlying surface edge.\n" );
+    return CRhinoCommand::nothing;  
+  }
+ 
+  ON_Surface* myface = srf->DuplicateSurface();
+  if( !myface )
+    return CRhinoCommand::failure;
+ 
+  bool rc = RhinoExtendSurface( myface, edge_index, 5.0, true);  
+  if( rc )
+  {
+    ON_Brep* mybrep = new ON_Brep();
+    mybrep->Create( myface );
+    CRhinoBrepObject* obj = new CRhinoBrepObject();
+    obj->SetBrep( mybrep );
+    context.m_doc.ReplaceObject( CRhinoObjRef(objref.Object()), obj );
+    context.m_doc.Redraw();
+  }
+
+
+/////////
+
+
+
+
+
+
+
+return CRhinoCommand::success;
+
+
+
+	  
+}
+
+
+
+
+
+
+
+
+
+
+
 

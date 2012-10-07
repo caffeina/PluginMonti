@@ -92,4 +92,6 @@ public:
 public:
 	// con questo dovrebbe funzionare
 	CComboBox AltezzaFondelloControllo;
+public:
+	afx_msg void OnBnClickedButton5();
 };
