@@ -1236,7 +1236,7 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 	  CRhinoLayerTable& layer_table = context.m_doc.m_layer_table;
 	
 	  //begin calcolo il punto di intersezione per disegnare l'ugello
-	  double valore_ugello = -12;
+	  double valore_ugello =(_wtof(plugin.m_dialog->ValIniezioneDisassamento));
 	  ON_3dPoint inizio_linea (valore_ugello,0,0);
 	  ON_3dPoint fine_linea (valore_ugello,0,130);
 	  ON_Line line_ugello( inizio_linea, fine_linea );
@@ -1280,7 +1280,7 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 		
 		// Select two curves to intersect
   CRhinoGetObject go;
-  go.SetCommandPrompt( L"Seleziona Piano Visionale" );
+  go.SetCommandPrompt( L"Seleziona la linea originale del Piano Visionale" );
   go.SetGeometryFilter( ON::curve_object );
   go.GetObjects( 1, 1 );
   if( go.CommandResult() != CRhinoCommand::success )
@@ -1304,6 +1304,7 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
         overlap_tolerance
         );
  
+  ON_3dPoint PuntoIntersezione;
   // Process the results
   if( count > 0 )
   {
@@ -1318,6 +1319,7 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
       {
         context.m_doc.AddPointObject( e.m_B[0] );
         context.m_doc.AddCurveObject( ON_Line(e.m_A[0], e.m_B[0]) );
+		PuntoIntersezione = e.m_B[0];
       }
     }
     context.m_doc.Redraw();
@@ -1393,11 +1395,13 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 	  
 	  
 	  
-	  ON_3dPoint bottom_pt( -12.0,0, 91.0 );
+	  ON_3dPoint bottom_pt = PuntoIntersezione; // l'altro punto, e.m_A[0], non e' preciso.
 	  double bottom_radius = 3.25;
 	  ON_Circle bottom_circle( bottom_pt, bottom_radius );
 
-	   ON_3dPoint top_pt( -12.0,0 , 101.0);
+	   ON_3dPoint top_pt = PuntoIntersezione;
+	   
+		top_pt.z+=8.0;
 	   double top_radius = 11;
 	   ON_Circle top_circle( top_pt, top_radius );
 
