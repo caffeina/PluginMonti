@@ -1240,8 +1240,11 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 	  ON_3dPoint inizio_linea (valore_ugello,0,0);
 	  ON_3dPoint fine_linea (valore_ugello,0,130);
 	  ON_Line line_ugello( inizio_linea, fine_linea );
+	  const ON_LineCurve* crv3 = new ON_LineCurve(line_ugello);
+	  //crv3->DuplicateCurve
 
-	   context.m_doc.AddCurveObject( line_ugello );
+
+	  // context.m_doc.AddCurveObject( line_ugello );
 //begin deseleziona tutto
 	 const CRhinoLayer& layer = context.m_doc.m_layer_table.CurrentLayer();
 	
@@ -1277,15 +1280,16 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 		
 		// Select two curves to intersect
   CRhinoGetObject go;
-  go.SetCommandPrompt( L"Select two curves" );
+  go.SetCommandPrompt( L"Seleziona Piano Visionale" );
   go.SetGeometryFilter( ON::curve_object );
-  go.GetObjects( 2, 2 );
+  go.GetObjects( 1, 1 );
   if( go.CommandResult() != CRhinoCommand::success )
     return go.CommandResult();
  
   // Validate input
   const ON_Curve* curveA = go.Object(0).Curve();
-  const ON_Curve* curveB = go.Object(1).Curve();
+  const ON_Curve* curveB = crv3;//go.Object(1).Curve();
+	 
   if( 0 == curveA | 0 == curveB )
     return CRhinoCommand::failure;
  
