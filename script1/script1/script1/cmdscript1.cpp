@@ -600,9 +600,13 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 	const CRhinoLayer& layer = context.m_doc.m_layer_table.CurrentLayer();
 	ON_SimpleArray<CRhinoObject*> objects;
 	int object_count = context.m_doc.LookupObject( layer, objects );
+	const CRhinoBrepObject* brep_obj;
+	const CRhinoCurveObject* curve_obj;
+	const CRhinoSurfaceObject* surface_obj;
 	if( object_count > 0 )
 	{
 		int brep_obj_count = 0;
+		int polycurve_count = 0;
 		const CRhinoObject* object = 0;
 		for(int i = 0; i < object_count; i++ )
 		{
@@ -610,26 +614,19 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 			/************************************/
 			/*TRY CASTING AS A RHINO BREP OBJECT*/ 
 			/************************************/
-			//const ON_PolyCurve* polycurve = CRhinoPolyEdge::Cast(object);
-			//if(polycurve)
-			//{
-			//	if(!object->IsSolid())
-			//	{
-			//		brep_obj_count++;
-			//	}
-			//}
-			const CRhinoBrepObject* brep_obj = CRhinoBrepObject::Cast( object );
-			if( brep_obj && !object->IsSolid())
+			brep_obj = CRhinoBrepObject::Cast( object );
+			if( brep_obj && object->IsSolid())
 			{
 				brep_obj_count++;
 			}
-			//const ON_Geometry* geo = object->Geometry();
-			//if( geo)
-			//{
-			//	const ON_Cylinder *cylinder = 
-			//	brep_obj_count++;
-			//}
-
+			/*******************************/
+			/*TRY CASTING AS A CURVE OBJECT*/ 
+			/*******************************/
+			curve_obj = CRhinoCurveObject::Cast( object );
+			if( curve_obj )
+			{
+				polycurve_count++;
+			}
 		}
 		if( brep_obj_count == 0)
 		{
@@ -750,14 +747,269 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				/*********************************************/
 				/*           CREATE FONDELLO PLANE           */
 				/*********************************************/
+
 				ON_3dPoint point0((63.5 + 20.0),0.0, 0.0);
 				ON_3dPoint point1(-(63.5 + 20.0),0.0, 0.0);
 				ON_LineCurve curve0( point0, point1 );
+
+				/*******************************************/
+				/*ATTACH USER STRING TO OBJECT'S ATTRIBUTES*/ 
+				/*******************************************/
+				//ON_wString key = L"test";
+				//ON_wString text = L"sample text";
+				//curve0.SetUserString(key, text);
+
 				context.m_doc.AddCurveObject(curve0);
 				context.m_doc.Redraw();
 
 
+				/******************************************************/
+				//ON_SimpleArray<ON_SumSurface*> cutters;
+				object_count = context.m_doc.LookupObject( layer, objects );
+				for(int i = 0; i < object_count; i++ )
+				{
+					object = objects[ i ];
+					/*******************************/
+					/*TRY CASTING AS A CURVE OBJECT*/ 
+					/*******************************/
+					curve_obj = CRhinoCurveObject::Cast( object );
+					if( curve_obj )
+					{
+						const ON_Geometry* geo = curve_obj->Geometry();
+						const ON_Curve* curve00 = ON_Curve::Cast(geo); 
+						ON_3dPoint point = curve00->PointAt(0.0);
+						ON_3dPoint point0(point.x, (point.y + 70.0), point.z);
+						ON_3dPoint point1(point.x, (point.y - 70.0), point.z);
+						ON_LineCurve* curve = new ON_LineCurve();
+						curve->SetStartPoint(point0);
+						curve->SetEndPoint(point1);
+						ON_SumSurface sumSurf0;
+						sumSurf0.Create(*curve, *curve00);
+						if( context.m_doc.AddSurfaceObject(sumSurf0) )
+						{
+							//cutters.Append(&sumSurf0);
+							context.m_doc.Redraw();
+						}
+					}
+				}/*CLOSED FOR*/
 
+				/*********************************************************/
+				//object_count = context.m_doc.LookupObject( layer, objects );
+				//ON_SimpleArray<ON_Brep*> pieces;
+				//double tol = context.m_doc.AbsoluteTolerance();				
+				//for(int i = 0; i < object_count; i++ )
+				//{
+				//	object = objects[ i ];
+				//	/************************************/
+				//	/*TRY CASTING AS A RHINO BREP OBJECT*/ 
+				//	/************************************/
+				//	brep_obj = CRhinoBrepObject::Cast( object );
+				//	if( brep_obj && object->IsSolid())
+				//	{
+				//		const ON_Brep* split = brep_obj->Brep();
+				//		if( !split )
+				//		{
+				//			return failure;
+				//		}
+				//		//for(int j = 0; j < cutters.Count(); j++ )
+				//		//{
+				//		//	//surface_obj = CRhinoSurfaceObject::Cast(cutters[j]);
+				//		//	//if(surface_obj)
+				//		//	//{
+				//		//		const ON_Brep* cutter = ON_Brep::Cast(cutters[j]);
+				//		//		if(cutter)
+				//		//		{
+				//		//			if( !RhinoBrepSplit(*split, *cutter, tol, pieces) )
+				//		//			{
+				//		//				continue;
+				//		//				RhinoApp().Print( L"Unable to split brep.\n" );
+				//		//			}
+				//		//			else
+				//		//			{
+				//		//				  int i, count = pieces.Count();
+				//		//				  if( count == 0 | count == 1 )
+				//		//				  {
+				//		//					if( count == 1 )
+				//		//					{
+				//		//					  delete pieces[0];
+				//		//					}
+				//		//					return nothing;
+				//		//				  }
+				//		//				 
+				//		//				  CRhinoObjectAttributes attrib = objects[ i ]->Attributes();
+				//		//				  attrib.m_uuid = ON_nil_uuid; 
+				//		//				 
+				//		//				  const CRhinoObjectVisualAnalysisMode* vam_list = objects[ i ]->m_analysis_mode_list;
+				//		//				 
+				//		//				  for( i = 0; i < count; i++ )
+				//		//				  {
+				//		//					CRhinoBrepObject* brep_object = new CRhinoBrepObject( attrib );
+				//		//					if( brep_object )
+				//		//					{
+				//		//					  brep_object->SetBrep( pieces[i] );
+				//		//					  if( context.m_doc.AddObject(brep_object) )
+				//		//						RhinoCopyAnalysisModes( vam_list, brep_object );
+				//		//					  else
+				//		//						delete brep_object;
+				//		//					}
+				//		//				  }
+				//		//				 
+				//		//				  //context.m_doc.DeleteObject( split_ref ); 
+				//		//				  context.m_doc.Redraw();
+				//		//			}/*CHIUSURA ELSE*/
+				//		//		}
+				//		//	//}
+				//		//}
+
+
+
+
+				//		//for(int j = 0; j < object_count; j++ )
+				//		//{
+				//		//	if(i != j)/*PER NON CONTROLLARE SE L'OGGETTO I-ESIMO È UGUALE A SE STESSO*/
+				//		//	{
+				//		//		object = objects[ j ];
+				//		//		/************************************/
+				//		//		/*TRY CASTING AS A RHINO BREP OBJECT*/ 
+				//		//		/************************************/
+				//		//		surface_obj = CRhinoSurfaceObject::Cast(object);
+				//		//		if(surface_obj)
+				//		//		{
+				//		//			const ON_Brep* cutter = ON_Brep::Cast( surface_obj );
+				//		//			/************************/
+				//		//			/*TRY SPLITTING THE BREP*/
+				//		//			/************************/
+				//		//			if( !RhinoBrepSplit(*split, *cutter, tol, pieces) )
+				//		//			{
+				//		//				continue;
+				//		//				//RhinoApp().Print( L"Unable to split brep.\n" );
+				//		//			}
+				//		//			else
+				//		//			{
+				//		//				  int i, count = pieces.Count();
+				//		//				  if( count == 0 | count == 1 )
+				//		//				  {
+				//		//					if( count == 1 )
+				//		//					{
+				//		//					  delete pieces[0];
+				//		//					}
+				//		//					return nothing;
+				//		//				  }
+				//		//				 
+				//		//				  CRhinoObjectAttributes attrib = objects[ i ]->Attributes();
+				//		//				  attrib.m_uuid = ON_nil_uuid; 
+				//		//				 
+				//		//				  const CRhinoObjectVisualAnalysisMode* vam_list = objects[ i ]->m_analysis_mode_list;
+				//		//				 
+				//		//				  for( i = 0; i < count; i++ )
+				//		//				  {
+				//		//					CRhinoBrepObject* brep_object = new CRhinoBrepObject( attrib );
+				//		//					if( brep_object )
+				//		//					{
+				//		//					  brep_object->SetBrep( pieces[i] );
+				//		//					  if( context.m_doc.AddObject(brep_object) )
+				//		//						RhinoCopyAnalysisModes( vam_list, brep_object );
+				//		//					  else
+				//		//						delete brep_object;
+				//		//					}
+				//		//				  }
+				//		//				 
+				//		//				  //context.m_doc.DeleteObject( split_ref ); 
+				//		//				  context.m_doc.Redraw();
+				//		//			}
+				//		//		}/*CHIUSURA IF SURF*/
+				//		//	}/*CHIUSURA IF I!=J*/
+				//		//}
+				//	}/*CHIUSURA IF brep_obj && object->IsSolid()*/					
+				//}/*CLOSED FOR*/
+
+
+
+				  /************************/
+				  /*PICK THE BREP TO SPLIT*/ 
+				  /************************/
+				 // CRhinoGetObject go;
+				 // go.SetCommandPrompt( L"Select cylinder to split" );
+				 // go.SetGeometryFilter( CRhinoGetObject::surface_object | CRhinoGetObject::polysrf_object  );
+				 // go.GetObjects( 1, 1 );
+				 // if( go.CommandResult() != success )
+				 // {
+					//return go.CommandResult();
+				 // }
+				 // else
+				 // {
+					//    RhinoMessageBox(L"CYLINDER IS SELECTED", PlugIn()->PlugInName(), MB_OK | MB_ICONEXCLAMATION );
+				 // }
+				 //
+				 // const CRhinoObjRef& split_ref = go.Object(0);
+				 //
+				 // const CRhinoObject* split_object = split_ref.Object();
+				 // if( !split_object )
+				 // {
+					//return failure;
+				 // }
+				 //
+				 // const ON_Brep* split = split_ref.Brep();
+				 // if( !split )
+				 // {
+					//return failure;
+				 // }
+
+				 // /*PICK THE CUTTING BREP*/ 
+				 // go.SetCommandPrompt( L"Select cutting surface or polysuface" );
+				 // go.EnablePreSelect( FALSE );
+				 // go.EnableDeselectAllBeforePostSelect( FALSE );
+				 // go.GetObjects( 1, 1 );
+				 // if( go.CommandResult() != success )
+				 // {
+					//return go.CommandResult();
+				 // }
+				 //
+				 // const ON_Brep* cutter = go.Object(0).Brep();
+				 // if( !cutter )
+				 // {
+					//return failure;
+				 // }
+				 //
+				 // ON_SimpleArray<ON_Brep*> pieces;
+				 // double tol = context.m_doc.AbsoluteTolerance();
+				 //
+				 // // Try splitting the brep
+				 // if( !RhinoBrepSplit(*split, *cutter, tol, pieces) )
+					//RhinoApp().Print( L"Unable to split brep.\n" );
+				 //
+				 // int i, count = pieces.Count();
+				 // if( count == 0 | count == 1 )
+				 // {
+					//if( count == 1 )
+					//{
+					//  delete pieces[0];
+					//}
+					//return nothing;
+				 // }
+				 //
+				 // CRhinoObjectAttributes attrib = split_object->Attributes();
+				 // attrib.m_uuid = ON_nil_uuid; 
+				 //
+				 // const CRhinoObjectVisualAnalysisMode* vam_list = split_object->m_analysis_mode_list;
+				 //
+				 // for( i = 0; i < count; i++ )
+				 // {
+					//CRhinoBrepObject* brep_object = new CRhinoBrepObject( attrib );
+					//if( brep_object )
+					//{
+					//  brep_object->SetBrep( pieces[i] );
+					//  if( context.m_doc.AddObject(brep_object) )
+					//	RhinoCopyAnalysisModes( vam_list, brep_object );
+					//  else
+					//	delete brep_object;
+					//}
+				 // }
+				 //
+				 // context.m_doc.DeleteObject( split_ref ); 
+				 // context.m_doc.Redraw();
+ 
+				/*********************************************************/
 			}
 		}/*CLOSED IF OVER CHECKING BREP COUNT OBJECT*/
 		else
