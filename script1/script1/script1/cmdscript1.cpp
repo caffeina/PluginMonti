@@ -10,6 +10,37 @@
 #include "atlstr.h"
 
 
+ON_UUID pvcurva;
+static bool SelectObjectByUuid( CRhinoDoc& doc, ON_UUID uuid, bool bRedraw )
+{
+  bool rc = false;
+  const CRhinoObject* object = doc.LookupObject( uuid );
+  if( object && object->IsSelectable() )
+  {
+    object->Select( true );
+    if( bRedraw )
+      doc.Redraw();
+    rc = true;
+  }
+  return rc;
+}
+
+static bool SelectObjectByUuid( CRhinoDoc& doc, const wchar_t* uuid_str, bool bRedraw )
+{
+  bool rc = false;
+  if( uuid_str && uuid_str[0] )
+    rc = SelectObjectByUuid( doc, ON_UuidFromString(uuid_str), bRedraw );
+  return rc;
+}
+
+
+
+
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -225,6 +256,39 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 			bool rc1 = RhinoExtendCurve(crv0, CRhinoExtend::Line, 0, 15);
 			context.m_doc.ReplaceObject(objref, *crv0 );
             context.m_doc.Redraw();
+
+			///// begin prova memorizzazione id o name linea pv
+		////ON_UUID uuid1 = gc->Attributes().m_uuid;
+		////	ON_UUID uuid1 = objref.ObjectUuid();
+		//	//ON_UuidToString( uuid1, cvrPrima );
+		//	 const CRhinoObject* obj5 = objref.Object();
+  //          ON_UUID uuid1 = obj5->Attributes().m_uuid;
+
+		//	pvcurva =  uuid1;
+		//	ON_3dmObjectAttributes obj_attribs = obj5->Attributes();
+		//	CRhinoGetString gs;
+  //gs.SetCommandPrompt( L"New object name" );
+  //gs.SetDefaultString( obj_attribs.m_name );
+  //gs.AcceptNothing( TRUE );
+  //gs.GetString();
+  //if( gs.CommandResult() != CRhinoCommand::success )
+  //  return gs.CommandResult();
+ 
+  //// Get the string entered by the user
+  //ON_wString obj_name = gs.String();
+  //obj_name.TrimLeftAndRight();
+ 
+  //// Is name the same?
+  //if( obj_name.Compare(obj_attribs.m_name) == 0 )
+  //  return CRhinoCommand::nothing;
+
+		//	//ON_wString obj_name = (L"stringanome");
+		//	obj_attribs.m_name = obj_name;
+		//	context.m_doc.ModifyObjectAttributes( objref, obj_attribs );
+
+///// end prova memorizzazione id o name linea pv
+
+
 
 			
 			ON_3dPoint p0 = crv0->PointAtStart();
@@ -919,6 +983,160 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 		/*GET A REFERENCE TO THE LAYER TABLE*/
 	  CRhinoLayerTable& layer_table = context.m_doc.m_layer_table;
 	
+	  //begin calcolo il punto di intersezione per disegnare l'ugello
+	  double valore_ugello = -12;
+	  ON_3dPoint inizio_linea (valore_ugello,0,0);
+	  ON_3dPoint fine_linea (valore_ugello,0,130);
+	  ON_Line line_ugello( inizio_linea, fine_linea );
+
+	   context.m_doc.AddCurveObject( line_ugello );
+//begin deseleziona tutto
+	 const CRhinoLayer& layer = context.m_doc.m_layer_table.CurrentLayer();
+	
+	  
+	  
+	 
+	 
+	  ON_SimpleArray<CRhinoObject*> obj_list;
+	  
+      
+	
+		  int j, obj_count = context.m_doc.LookupObject( layer, obj_list );
+		  for( j = 0; j < obj_count; j++ )
+		  {
+				  CRhinoObject* obj = obj_list[j];
+				  if( obj && obj->IsSelectable() )
+					  obj->UnselectAllSubObjects();
+					obj->Select(false);
+				  if( obj_count )
+					context.m_doc.Redraw();
+		  }
+		// end deseleziona tutto
+	   //const ON_Object* obj_ptr = context.m_doc.LookupDocumentObject(pvcurva, false);
+//	   CRhinoObjRef& objref5 = CRhinoObject* LookupObject(pvcurva);
+	  
+		SelectObjectByUuid( context.m_doc, pvcurva, true );
+
+	   //const CRhinoObject* object = context.m_doc.LookupObject( pvcurva );
+	   //ON_TextLog* text_log;
+	   //object->IsValid();
+	   // inizio esempio
+
+		
+		// Select two curves to intersect
+  CRhinoGetObject go;
+  go.SetCommandPrompt( L"Select two curves" );
+  go.SetGeometryFilter( ON::curve_object );
+  go.GetObjects( 2, 2 );
+  if( go.CommandResult() != CRhinoCommand::success )
+    return go.CommandResult();
+ 
+  // Validate input
+  const ON_Curve* curveA = go.Object(0).Curve();
+  const ON_Curve* curveB = go.Object(1).Curve();
+  if( 0 == curveA | 0 == curveB )
+    return CRhinoCommand::failure;
+ 
+  // Calculate the intersection
+  double intersection_tolerance = 0.001;
+  double overlap_tolerance = 0.0;
+  ON_SimpleArray<ON_X_EVENT> events;
+  int count = curveA->IntersectCurve(
+        curveB, 
+        events, 
+        intersection_tolerance, 
+        overlap_tolerance
+        );
+ 
+  // Process the results
+  if( count > 0 )
+  {
+	  ::RhinoApp().Print( L"Intersezione punto per ugello trovato");
+	  
+    int i;
+    for( i = 0; i < events.Count(); i++ )
+    {
+      const ON_X_EVENT& e = events[i];
+      context.m_doc.AddPointObject( e.m_A[0] );
+      if( e.m_A[0].DistanceTo(e.m_B[0]) > ON_EPSILON )
+      {
+        context.m_doc.AddPointObject( e.m_B[0] );
+        context.m_doc.AddCurveObject( ON_Line(e.m_A[0], e.m_B[0]) );
+      }
+    }
+    context.m_doc.Redraw();
+  }
+ 
+
+
+ 
+ /* ON_UUID uuid = obj->Attributes().m_uuid;
+  ON_wString str;
+  ON_UuidToString( uuid, str );
+  ::RhinoApp().Print( L"The object's unique identifier is \"%s\".\n", str );*/
+
+
+
+
+		// fine esempio
+		
+	
+		
+		//const CRhinoObjRef& objref1 = ref; //era object
+
+	  /*const ON_LineCurve* GetLineCurve( const ON_Curve* pC5 ){
+	  const ON_LineCurve* p = 0;
+	  if( pC5 != 0 )
+		p = ON_LineCurve::Cast( pC5 );
+	  return p;
+		//	}*/
+
+	 // // const ON_LineCurve* pC5 = ON_LineCurve::Cast( ref.Geometry() );
+	 ////  
+		//	ON_Line line1 = crv7->m_line;
+		////	//ON_Line line1 = pC5->
+
+	 //  ON_3dVector v0 = line_ugello.to - line_ugello.from;
+		//v0.Unitize();
+ 
+	 //ON_3dVector v1 = line1.to - line1.from;
+		//v1.Unitize();
+
+		//if( v0.IsParallelTo(v1) != 0 )
+  //{
+  //  RhinoApp().Print( L"Selected lines are parallel.\n" );
+  //  return nothing;
+  //}
+ 
+
+		// ON_Line ray0( line_ugello.from, line_ugello.from + v0 );
+  //ON_Line ray1( line1.from, line1.from + v1 );
+
+  //double s = 0, t = 0;
+  //if( !ON_Intersect(ray0, ray1, &s, &t) )
+  //{
+  //  RhinoApp().Print( L"No intersection found.\n" );
+  //  return nothing;
+  //}
+ 
+  //ON_3dPoint pt0 = line_ugello.from + s * v0;
+  //ON_3dPoint pt1 = line1.from + t * v1;
+  //context.m_doc.AddPointObject( pt0 );
+  //
+  //context.m_doc.Redraw();
+
+
+
+	   //go5.g
+		 //  const CRhinoObjRef& objref5 = go5.;
+	   //CRhinoGetObject;
+	   //CRhinoDoc::LookupDocumentObject(
+
+
+	  //begin calcolo il punto di intersezione per disegnare l'ugello
+	  
+	  
+	  
 	  ON_3dPoint bottom_pt( -12.0,0, 91.0 );
 	  double bottom_radius = 3.25;
 	  ON_Circle bottom_circle( bottom_pt, bottom_radius );
@@ -954,64 +1172,64 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 
 //////
 
-   CRhinoGetObject go;
-  go.SetCommandPrompt( L"Select edge of surface to extend" );
-  go.SetGeometryFilter(CRhinoGetObject::edge_object);
-  go.SetGeometryAttributeFilter( CRhinoGetObject::edge_curve );
-  go.GetObjects( 1, 1 );
-  if( go.CommandResult() != CRhinoCommand::success )
-    return go.CommandResult();
+  // CRhinoGetObject go;
+  //go.SetCommandPrompt( L"Select edge of surface to extend" );
+  //go.SetGeometryFilter(CRhinoGetObject::edge_object);
+  //go.SetGeometryAttributeFilter( CRhinoGetObject::edge_curve );
+  //go.GetObjects( 1, 1 );
+  //if( go.CommandResult() != CRhinoCommand::success )
+  //  return go.CommandResult();
  
-  const CRhinoObjRef& objref = go.Object(0);
-  const ON_Surface* srf = objref.Surface();
-  if( !srf )
-  {
-    RhinoApp().Print( L"Unable to extend polysurfaces.\n" );
-    return CRhinoCommand::nothing;    
-  }
+  //const CRhinoObjRef& objref = go.Object(0);
+  //const ON_Surface* srf = objref.Surface();
+  //if( !srf )
+  //{
+  //  RhinoApp().Print( L"Unable to extend polysurfaces.\n" );
+  //  return CRhinoCommand::nothing;    
+  //}
  
-  const ON_Brep* brep = objref.Brep();
-  const ON_BrepFace* face = objref.Face();
-  if( !brep | !face | face->m_face_index < 0 )
-    return CRhinoCommand::failure;
+  //const ON_Brep* brep = objref.Brep();
+  //const ON_BrepFace* face = objref.Face();
+  //if( !brep | !face | face->m_face_index < 0 )
+  //  return CRhinoCommand::failure;
  
-  if( !brep->IsSurface() )
-  {
-    RhinoApp().Print( L"Unable to extend trimmed surfaces.\n" );
-    return CRhinoCommand::nothing;    
-  }
+  //if( !brep->IsSurface() )
+  //{
+  //  RhinoApp().Print( L"Unable to extend trimmed surfaces.\n" );
+  //  return CRhinoCommand::nothing;    
+  //}
  
-  const ON_BrepTrim* trim = objref.Trim();
-  if( !trim )
-    return CRhinoCommand::failure;
+  //const ON_BrepTrim* trim = objref.Trim();
+  //if( !trim )
+  //  return CRhinoCommand::failure;
  
-  ON_Surface::ISO edge_index( trim->m_iso );
-  int dir = edge_index % 2;
-  if( srf->IsClosed(1-dir) )
-  {
-    RhinoApp().Print(L"Unable to extend surface at seam.\n" );
-    return CRhinoCommand::nothing;  
-  }
-  if( edge_index < ON_Surface::W_iso | edge_index > ON_Surface::N_iso )
-  {
-    RhinoApp().Print( L"Selected edge must be an underlying surface edge.\n" );
-    return CRhinoCommand::nothing;  
-  }
+  //ON_Surface::ISO edge_index( trim->m_iso );
+  //int dir = edge_index % 2;
+  //if( srf->IsClosed(1-dir) )
+  //{
+  //  RhinoApp().Print(L"Unable to extend surface at seam.\n" );
+  //  return CRhinoCommand::nothing;  
+  //}
+  //if( edge_index < ON_Surface::W_iso | edge_index > ON_Surface::N_iso )
+  //{
+  //  RhinoApp().Print( L"Selected edge must be an underlying surface edge.\n" );
+  //  return CRhinoCommand::nothing;  
+  //}
  
-  ON_Surface* myface = srf->DuplicateSurface();
-  if( !myface )
-    return CRhinoCommand::failure;
+  //ON_Surface* myface = srf->DuplicateSurface();
+  //if( !myface )
+  //  return CRhinoCommand::failure;
  
-  bool rc = RhinoExtendSurface( myface, edge_index, 5.0, true);  
-  if( rc )
-  {
-    ON_Brep* mybrep = new ON_Brep();
-    mybrep->Create( myface );
-    CRhinoBrepObject* obj = new CRhinoBrepObject();
-    obj->SetBrep( mybrep );
-    context.m_doc.ReplaceObject( CRhinoObjRef(objref.Object()), obj );
-    context.m_doc.Redraw();
-  }
+  //bool rc = RhinoExtendSurface( myface, edge_index, 5.0, true);  
+  //if( rc )
+  //{
+  //  ON_Brep* mybrep = new ON_Brep();
+  //  mybrep->Create( myface );
+  //  CRhinoBrepObject* obj = new CRhinoBrepObject();
+  //  obj->SetBrep( mybrep );
+  //  context.m_doc.ReplaceObject( CRhinoObjRef(objref.Object()), obj );
+  //  context.m_doc.Redraw();
+  //}
 
 
 /////////
@@ -1032,11 +1250,82 @@ return CRhinoCommand::success;
 
 
 
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//
+// BEGIN NewName command
+//
 
+class CCommandNewName : public CRhinoCommand
+{
+public:
+	CCommandNewName() {}
+	~CCommandNewName() {}
+	UUID CommandUUID()
+	{
+		// {CF4D4BFF-AC77-4A40-AD75-3C3BFD5FD7DD}
+		static const GUID NewNameCommand_UUID =
+		{ 0xCF4D4BFF, 0xAC77, 0x4A40, { 0xAD, 0x75, 0x3C, 0x3B, 0xFD, 0x5F, 0xD7, 0xDD } };
+		return NewNameCommand_UUID;
+	}
+	const wchar_t* EnglishCommandName() { return L"NewName"; }
+	const wchar_t* LocalCommandName() { return L"NewName"; }
+	CRhinoCommand::result RunCommand( const CRhinoCommandContext& );
+};
 
+// The one and only CCommandNewName object
+static class CCommandNewName theNewNameCommand;
 
+CRhinoCommand::result CCommandNewName::RunCommand( const CRhinoCommandContext& context )
+{
+	// Select an object to modify
+  CRhinoGetObject go;
+  go.SetCommandPrompt( L"Select object to change name" );
+  go.EnablePreSelect( TRUE );
+  go.EnableSubObjectSelect( FALSE );
+  go.GetObjects( 1, 1 );
+  if( go.CommandResult() != CRhinoCommand::success )
+    return go.CommandResult();
+ 
+  // Get the object reference
+  const CRhinoObjRef& objref = go.Object(0);
+ 
+  // Get the object
+  const CRhinoObject* obj = objref.Object();
+  if( !obj )
+    return CRhinoCommand::failure;
+ 
+  // Make copy of object attributes. This objects
+  // holds an object's user-defined name.
+  ON_3dmObjectAttributes obj_attribs = obj->Attributes();
+ 
+  // Prompt for new object name
+  CRhinoGetString gs;
+  gs.SetCommandPrompt( L"New object name" );
+  gs.SetDefaultString( obj_attribs.m_name );
+  gs.AcceptNothing( TRUE );
+  gs.GetString();
+  if( gs.CommandResult() != CRhinoCommand::success )
+    return gs.CommandResult();
+ 
+  // Get the string entered by the user
+  ON_wString obj_name = gs.String();
+  obj_name.TrimLeftAndRight();
+ 
+  // Is name the same?
+  if( obj_name.Compare(obj_attribs.m_name) == 0 )
+    return CRhinoCommand::nothing;
+ 
+  // Modify the attributes of the object
+  obj_attribs.m_name = obj_name;
+  context.m_doc.ModifyObjectAttributes( objref, obj_attribs );
+ 
+  return CRhinoCommand::success;
 
+}
 
-
-
-
+//
+// END NewName command
+//
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
