@@ -1262,7 +1262,7 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 				  CRhinoObject* obj = obj_list[j];
 				  if( obj && obj->IsSelectable() )
 					  obj->UnselectAllSubObjects();
-					obj->Select(false);
+					//obj->Select(false);
 				  if( obj_count )
 					context.m_doc.Redraw();
 		  }
