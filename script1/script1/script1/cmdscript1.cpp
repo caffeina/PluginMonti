@@ -11,6 +11,7 @@
 
 
 ON_UUID pvcurva;
+ON_3dPoint AltezzaTacco;
 static bool SelectObjectByUuid( CRhinoDoc& doc, ON_UUID uuid, bool bRedraw )
 {
   bool rc = false;
@@ -367,6 +368,8 @@ CRhinoCommand::result CGenPianoVis::RunCommand( const CRhinoCommandContext& cont
 			/***************************************************/
 			double curve0_t = crv0->Domain().Max();
 			double curve1_t = curve1.Domain().Min();
+			ON_3dPoint PuntoAltezzaTacco = curve1.m_line.to;
+			AltezzaTacco = PuntoAltezzaTacco;
 			
 			
 			
@@ -743,6 +746,43 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 						delete dim_obj;
 					}
 				}
+				/*********************************************/
+				/*               DA SISTEMARE  By Nello              */
+				/*********************************************/
+				
+				ON_3dPoint provapunto2 = AltezzaTacco;
+				ON_3dPoint provapunto(63.5,0,provapunto2.z);
+				provapunto.z-=0.7;
+				ON_3dPoint pt_1(63.5, 0.0, (height - (_wtof(plugin.m_dialog->ValoreAltezzaFondello))));
+				CRhinoLinearDimension* dim_obj = new CRhinoLinearDimension();
+					ON_Plane plane( ON_zx_plane );
+					plane.SetOrigin(pt_1);
+					dim_obj->SetPlane( plane );
+					//ON_3dPoint pt_1(63.5, 0.0, 0.0);
+					ON_3dPoint pt_2 = provapunto;
+
+					double u, v;
+					plane.ClosestPointTo( pt_1, &u, &v );
+					dim_obj->SetPoint( 0, ON_2dPoint(u, v) );
+					dim_obj->SetPoint( 1, ON_2dPoint(u, (v + height/2)) );
+
+
+					plane.ClosestPointTo( pt_2, &u, &v );
+					dim_obj->SetPoint( 2, ON_2dPoint(u, v) );
+					dim_obj->SetPoint( 3, ON_2dPoint(u, (v + height/2)) );
+
+					dim_obj->UpdateText();
+					 
+					if( context.m_doc.AddObject(dim_obj) )
+					{
+						context.m_doc.Redraw();
+					}		
+					else
+					{
+						delete dim_obj;
+					}
+				
+
 
 				/*********************************************/
 				/*           CREATE FONDELLO PLANE           */
