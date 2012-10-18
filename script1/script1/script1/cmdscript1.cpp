@@ -782,6 +782,14 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 						delete dim_obj;
 					}
 				
+					/*INIZIO FUNZIONE CONTROLLO*/
+			
+					if ( (height - (_wtof(plugin.m_dialog->ValoreAltezzaFondello)))>=provapunto.z+10){
+				::RhinoApp().Print( L"Funzione controllo altezza OK");
+					}
+					else{
+						::RhinoApp().Print( L"Funzione controllo altezza NOK: CONTROLLARE!! Il valore della testa e' minore del valore minimo di 10 mm. Occorre diminuire l'altezza del fondello o aumentare l'altezza dello stampo.");
+					}
 
 
 				/*********************************************/
