@@ -679,9 +679,10 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				/*********************************************/
 				/*               DA SISTEMARE                */
 				/*********************************************/
+				
 				CRhinoSnapContext snap;
-				bool dec1 = snap.SnapToPoint(ON_3dPoint(63.5, 0.0, (height - (_wtof(plugin.m_dialog->ValoreAltezzaFondello)))));
-				bool dec2 = snap.SnapToPoint(ON_3dPoint(63.5, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello))));
+				bool dec1 = snap.SnapToPoint(ON_3dPoint(63.5, 0.0, (height - altfondello)));
+				bool dec2 = snap.SnapToPoint(ON_3dPoint(63.5, 0.0, -altfondello));
 				bool dec3 = snap.SnapToPoint(ON_3dPoint(63.5, 0.0, 0.0));
 				if(dec1 && dec2)
 				{
@@ -689,8 +690,8 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 					ON_Plane plane( ON_zx_plane );
 					plane.SetOrigin( ON_3dPoint(63.5, 0.0, 0.0) );
 					dim_obj->SetPlane( plane );
-					ON_3dPoint pt_1(63.5, 0.0, (height - (_wtof(plugin.m_dialog->ValoreAltezzaFondello))));
-					ON_3dPoint pt_2(63.5, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello)));
+					ON_3dPoint pt_1(63.5, 0.0, (height - altfondello));
+					ON_3dPoint pt_2(63.5, 0.0, -altfondello);
 
 					double u, v;
 					plane.ClosestPointTo( pt_1, &u, &v );
@@ -723,7 +724,7 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 					plane.SetOrigin( ON_3dPoint(63.5, 0.0, 0.0) );
 					dim_obj->SetPlane( plane );
 					ON_3dPoint pt_1(63.5, 0.0, 0.0);
-					ON_3dPoint pt_2(63.5, 0.0, -(_wtof(plugin.m_dialog->ValoreAltezzaFondello)));
+					ON_3dPoint pt_2(63.5, 0.0, -altfondello);
 
 					double u, v;
 					plane.ClosestPointTo( pt_1, &u, &v );
@@ -753,7 +754,7 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				ON_3dPoint provapunto2 = AltezzaTacco;
 				ON_3dPoint provapunto(63.5,0,provapunto2.z);
 				provapunto.z-=0.7;
-				ON_3dPoint pt_1(63.5, 0.0, (height - (_wtof(plugin.m_dialog->ValoreAltezzaFondello))));
+				ON_3dPoint pt_1(63.5, 0.0, (height - altfondello));
 				CRhinoLinearDimension* dim_obj = new CRhinoLinearDimension();
 					ON_Plane plane( ON_zx_plane );
 					plane.SetOrigin(pt_1);
@@ -784,7 +785,7 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				
 					/*INIZIO FUNZIONE CONTROLLO*/
 			
-					if ( (height - (_wtof(plugin.m_dialog->ValoreAltezzaFondello)))>=provapunto.z+10){
+					if ( (height - altfondello)>=provapunto.z+10){
 				::RhinoApp().Print( L"Funzione controllo altezza OK");
 					}
 					else{
