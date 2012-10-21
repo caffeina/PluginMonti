@@ -8,15 +8,16 @@
 #include "afxwin.h"
 #include "script1App.h"
 #include "atlstr.h"
+#include "TestUserData.h"
 
-
+// && object->IsSelectable()
 ON_UUID pvcurva;
 ON_3dPoint AltezzaTacco;
-static bool SelectObjectByUuid( CRhinoDoc& doc, ON_UUID uuid, bool bRedraw )
+static bool SelectObjectByUuid( CRhinoDoc& doc, ON_UUID  uuid, bool bRedraw )
 {
   bool rc = false;
   const CRhinoObject* object = doc.LookupObject( uuid );
-  if( object && object->IsSelectable() )
+  if( object  )
   {
     object->Select( true );
     if( bRedraw )
@@ -26,15 +27,41 @@ static bool SelectObjectByUuid( CRhinoDoc& doc, ON_UUID uuid, bool bRedraw )
   return rc;
 }
 
-static bool SelectObjectByUuid( CRhinoDoc& doc, const wchar_t* uuid_str, bool bRedraw )
+//static bool SelectObjectByUuid_S( CRhinoDoc& doc, const wchar_t* uuid_str, bool bRedraw )
+//{
+//  bool rc = false;
+// 
+//  if( uuid_str && uuid_str[0] )
+//    rc = SelectObjectByUuid( doc, ON_UuidFromString(uuid_str), bRedraw );
+//  ON_UUID prova = ON_UuidFromString(uuid_str);
+//   
+//  const CRhinoObject* object = doc.LookupObject( prova );
+//  if( object && object->IsSelectable() )
+//  {
+//    object->Select( true );
+//    if( bRedraw )
+//      doc.Redraw();
+//  }
+//  return rc;
+//}
+
+static bool SetNametoObject( CRhinoDoc& doc,unsigned int first_sn, ON_wString  name, bool bRedraw )
 {
-  bool rc = false;
-  if( uuid_str && uuid_str[0] )
-    rc = SelectObjectByUuid( doc, ON_UuidFromString(uuid_str), bRedraw );
-  return rc;
+
+	bool rc = false;
+	const CRhinoObject* objN = doc.LookupObjectByRuntimeSerialNumber( first_sn );
+	ON_3dmObjectAttributes obj_attribs = objN->Attributes(); 
+	 
+	/*Modify the attributes of the object*/ 
+	obj_attribs.m_name = name;
+	const CRhinoObjRef& objref = objN;
+	doc.ModifyObjectAttributes( objref, obj_attribs );
+	if( bRedraw )
+		doc.Redraw();
+	rc = true;
+
+	return rc;
 }
-
-
 
 
 
@@ -606,6 +633,7 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 	const CRhinoBrepObject* brep_obj;
 	const CRhinoCurveObject* curve_obj;
 	const CRhinoSurfaceObject* surface_obj;
+	int surf_count=0;
 	if( object_count > 0 )
 	{
 		int brep_obj_count = 0;
@@ -630,6 +658,11 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 			{
 				polycurve_count++;
 			}
+			surface_obj = CRhinoSurfaceObject::Cast( object );
+		    if( surface_obj )
+		    {
+				surf_count++;
+		    }
 		}
 		if( brep_obj_count == 0)
 		{
@@ -653,8 +686,11 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 			/*ADD CYLINDER*/
 			ON_Cylinder cylinder( circle, zaxis.Length() );
 			ON_Brep* brep = ON_BrepCylinder( cylinder, TRUE, TRUE );
+			unsigned int first_SN;
+			unsigned int next_SN;
 			if( brep )
 			{
+				first_SN = CRhinoObject::NextRuntimeObjectSerialNumber();
 				/********************/
 				/*TRANSLATE CYLINDER*/
 				/********************/
@@ -662,7 +698,8 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				CString strCBText1;
 				plugin.m_dialog->AltezzaFondelloControllo.GetLBText( nIndex1, strCBText1);
 				int altfondello = _wtoi(strCBText1);
-				
+				ON_wString obj_nameCyl = L"Cilindro";
+								
 				
 				brep->Translate(ON_3dVector( 0.0, 0.0, -altfondello));
 				CRhinoBrepObject* cylinder_object = new CRhinoBrepObject();
@@ -670,6 +707,15 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				if( context.m_doc.AddObject(cylinder_object) )
 				{
 					context.m_doc.Redraw();
+					next_SN = CRhinoObject::NextRuntimeObjectSerialNumber();
+					if( first_SN == next_SN )
+					{
+						return CRhinoCommand::nothing;
+					}
+					else
+					{
+						SetNametoObject(context.m_doc,first_SN,obj_nameCyl,true);			  
+					}
 				}
 				else
 				{
@@ -752,9 +798,9 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				/*********************************************/
 				
 				ON_3dPoint provapunto2 = AltezzaTacco;
-				ON_3dPoint provapunto(63.5,0,provapunto2.z);
+				ON_3dPoint provapunto(59.5,0,provapunto2.z);
 				provapunto.z-=0.7;
-				ON_3dPoint pt_1(63.5, 0.0, (height - altfondello));
+				ON_3dPoint pt_1(59.5, 0.0, (height - altfondello));
 				CRhinoLinearDimension* dim_obj = new CRhinoLinearDimension();
 					ON_Plane plane( ON_zx_plane );
 					plane.SetOrigin(pt_1);
@@ -806,33 +852,36 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 
 
 				/******************************************************/
-				/*******************************************/
-				/*ATTACH USER STRING TO OBJECT'S ATTRIBUTES*/ 
-				/*******************************************/
-				//ON_wString key = L"test";
-				//ON_wString text = L"surf";
-				//curve0.SetUserString(key, text);
-
-				ON_SimpleArray<ON_Brep*> cutters;
+				/*****************************/
+				/*USER GIVES NAME TO SURFACES*/ 
+				/*****************************/
+				unsigned int first_sn;
+				unsigned int next_sn;
+				ON_wString obj_name;
 				object_count = context.m_doc.LookupObject( layer, objects );
 				for(int i = 0; i < object_count; i++ )
 				{
 					object = objects[ i ];
+					first_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
+
 					/*******************************/
 					/*TRY CASTING AS A CURVE OBJECT*/ 
 					/*******************************/
 					curve_obj = CRhinoCurveObject::Cast( object );
 					if( curve_obj )
 					{
-
-						//CRhinoObjectAttributes attribs = curve_obj->Attributes();
-						//attribs.SetUserString( key, text );
-						//context.m_doc.ModifyObjectAttributes( curve_obj, attribs );
-
-
 						const ON_Geometry* geo = curve_obj->Geometry();
 						const ON_Curve* curve00 = ON_Curve::Cast(geo); 
-						ON_3dPoint point = curve00->PointAt(0.0);
+						ON_3dPoint point  = curve00->PointAt(0.0);
+						ON_3dPoint point_ = curve00->PointAt(1.0);
+						if((point.z + point_.z)/2 > 0.0)
+						{
+							obj_name = L"surfPV";
+						}
+						else
+						{
+							obj_name = L"surfFO";
+						}
 						ON_3dPoint point0(point.x, (point.y + 70.0), point.z);
 						ON_3dPoint point1(point.x, (point.y - 70.0), point.z);
 						ON_LineCurve* curve = new ON_LineCurve();
@@ -843,10 +892,19 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 
 						if( context.m_doc.AddSurfaceObject(sumSurf0) )
 						{
-							ON_Brep* brep = ON_Brep::Cast(&sumSurf0); 
-							cutters.Append(brep);
+
 							context.m_doc.Redraw();
+							next_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
+							if( first_sn == next_sn )
+							{
+								return CRhinoCommand::nothing;
+							}
+							else
+							{
+								SetNametoObject(context.m_doc,first_sn,obj_name,true);			  
+							}
 						}
+
 					}
 				}/*CLOSED FOR*/
 
@@ -861,6 +919,7 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				//		R++;
 				//	}
 				//}
+
 
 			  /************************/
 			  /*TRY SPLITTING THE BREP*/
@@ -884,6 +943,50 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 				  }
 				 
 				  const CRhinoObjRef& split_ref = go.Object(0);
+				  //prova nello stringa oggetto
+
+					/*CRhinoGetObject go7;
+  go7.SetCommandPrompt( L"Select object to change name" );
+  go7.EnablePreSelect( TRUE );
+  go7.EnableSubObjectSelect( FALSE );
+  go7.GetObjects( 1, 1 );
+  if( go7.CommandResult() != CRhinoCommand::success )
+    return go.CommandResult();*/
+ 
+  // Get the object reference
+  const CRhinoObjRef& objref = go.Object(0);
+ 
+  // Get the object
+  const CRhinoObject* obj = objref.Object();
+  if( !obj )
+    return CRhinoCommand::failure;
+ 
+  // Make copy of object attributes. This objects
+  // holds an object's user-defined name.
+  ON_3dmObjectAttributes obj_attribs = obj->Attributes();
+ 
+  // Prompt for new object name
+  /*CRhinoGetString gs;
+  gs.SetCommandPrompt( L"New object name" );
+  gs.SetDefaultString( obj_attribs.m_name );
+  gs.AcceptNothing( TRUE );
+  gs.GetString();
+  if( gs.CommandResult() != CRhinoCommand::success )
+    return gs.CommandResult();*/
+ 
+  // Get the string entered by the user
+  //ON_wString obj_name = gs.String();
+  ON_wString obj_name = L"cilindro1";
+  //obj_name.TrimLeftAndRight();
+ 
+  // Is name the same?
+ /* if( obj_name.Compare(obj_attribs.m_name) == 0 )
+    return CRhinoCommand::nothing;*/
+ 
+  // Modify the attributes of the object
+  obj_attribs.m_name = obj_name;
+  context.m_doc.ModifyObjectAttributes( objref, obj_attribs );
+				  //end nello
 				 
 				  const CRhinoObject* split_object = split_ref.Object();
 				  if( !split_object )
@@ -963,6 +1066,34 @@ CRhinoCommand::result CGenCylinder::RunCommand( const CRhinoCommandContext& cont
 			  }
 
 
+
+		    /*CREATE A NEW LAYER*/
+			  ON_Layer layer;
+			  int layer_index = 0;
+			  ON_Color color = ON_Color(0, 0, 0);
+			  ON_wString layer_name_FONDELLO = L"FONDELLO";
+			  layer.SetLayerName( layer_name_FONDELLO );
+			  layer.SetPlotColor(color.Green());
+
+			/*ADD THE LAYER TO THE LAYER TABLE*/ 
+			  layer_index = context.m_doc.m_layer_table.AddLayer( layer );
+
+			  ON_wString layer_name_MATRICE  = L"MATRICE";
+			  layer.SetLayerName( layer_name_MATRICE );
+			  layer.SetColor(color.Red());
+
+			/*ADD THE LAYER TO THE LAYER TABLE*/ 
+			  layer_index = context.m_doc.m_layer_table.AddLayer( layer );
+
+
+			  ON_wString layer_name_FISSO    = L"FISSO";
+			  layer.SetLayerName( layer_name_FISSO );
+			  layer.SetColor(color.Blue());
+
+			/*ADD THE LAYER TO THE LAYER TABLE*/ 
+			  layer_index = context.m_doc.m_layer_table.AddLayer( layer );
+	  
+			  context.m_doc.Redraw();
 			/*********************************************************/
 			}
 		}/*CLOSED IF OVER CHECKING BREP COUNT OBJECT*/
@@ -1188,7 +1319,56 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 
 		/*GET A REFERENCE TO THE LAYER TABLE*/
 	  CRhinoLayerTable& layer_table = context.m_doc.m_layer_table;
+	  
+	  CRhinoGetObject go9;
+  go9.SetCommandPrompt( L"Select object to change name" );
+  go9.EnablePreSelect( TRUE );
+  go9.EnableSubObjectSelect( FALSE );
+  go9.GetObjects( 1, 1 );
+  if( go9.CommandResult() != CRhinoCommand::success )
+    return go9.CommandResult();
+ 
+  // Get the object reference
+  const CRhinoObjRef& objref9 = go9.Object(0);
+ 
+  // Get the object
+  const CRhinoObject* obj9 = objref9.Object();
+   obj9->Select( false );
+  if( !obj9 )
+    return CRhinoCommand::failure;
+ 
+  // Make copy of object attributes. This objects
+  // holds an object's user-defined name.
+  ON_3dmObjectAttributes obj_attribs9 = obj9->Attributes();
 	
+	    //Prompt for new object name
+  CRhinoGetString gs1;
+  
+  //gs1.SetDefaultString(
+  /*gs1.SetCommandPrompt( L"New object name" );
+  gs1.SetDefaultString( obj_attribs9.m_name );
+  gs1.AcceptNothing( TRUE );
+  gs1.GetString();
+  if( gs1.CommandResult() != CRhinoCommand::success )
+    return gs1.CommandResult();*/
+
+ 
+ 
+  // Get the string entered by the user
+//  ON_wString obj_name1 = gs1.String();
+//  //obj_name.TrimLeftAndRight();
+////const wchar_t* prova5 = new(L"testo");  
+//  //wchar_t name( L"testo" ); 
+//const wchar_t* szName = gs1.String();
+
+CTestUserData* ud = CTestUserData::Cast( obj_attribs9.GetUserData(ud->Id()) );
+
+	  //SelectObjectByUuid_S(context.m_doc,obj_attribs9.m_name,true);
+	  SelectObjectByUuid(context.m_doc,obj_attribs9.m_uuid,true);
+
+
+
+
 	  //begin calcolo il punto di intersezione per disegnare l'ugello
 	  double valore_ugello =(_wtof(plugin.m_dialog->ValIniezioneDisassamento));
 	  ON_3dPoint inizio_linea (valore_ugello,0,0);
@@ -1224,7 +1404,7 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
 	   //const ON_Object* obj_ptr = context.m_doc.LookupDocumentObject(pvcurva, false);
 //	   CRhinoObjRef& objref5 = CRhinoObject* LookupObject(pvcurva);
 	  
-		SelectObjectByUuid( context.m_doc, pvcurva, true );
+		//SelectObjectByUuid( context.m_doc, pvcurva, true );
 
 	   //const CRhinoObject* object = context.m_doc.LookupObject( pvcurva );
 	   //ON_TextLog* text_log;
@@ -1373,14 +1553,27 @@ CRhinoCommand::result CGenUgello::RunCommand( const CRhinoCommandContext& contex
   revsrf->m_angle[1] = revsrf->m_t[1] = 2.0*ON_PI;
  
   ON_Brep* tcone_brep = ON_BrepRevSurface(revsrf, TRUE, TRUE );
+  unsigned int first_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
   if( tcone_brep )
   {
     CRhinoBrepObject* tcone_object = new CRhinoBrepObject();
     tcone_object->SetBrep( tcone_brep );
+	
+
     if( context.m_doc.AddObject(tcone_object) )
       context.m_doc.Redraw();
     else
       delete tcone_object;
+  }
+
+  unsigned int next_sn = CRhinoObject::NextRuntimeObjectSerialNumber();
+  /*IF THE TWO ARE THE SAME, THEN NOTHING HAPPENED*/
+  if( first_sn == next_sn )
+    return CRhinoCommand::nothing;
+  else
+  {
+	  ON_wString obj_name = L"ugello";
+	  SetNametoObject(context.m_doc,first_sn,obj_name,true);			  
   }
 
 
